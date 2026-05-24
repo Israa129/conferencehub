@@ -1,0 +1,14 @@
+@"
+# Laravel
+backend/vendor/
+backend/.env
+backend/node_modules/
+
+# Angular
+frontend/node_modules/
+frontend/dist/
+
+# Divers
+.DS_Store
+*.log
+"@ | Out-File -FilePath .gitignore -Encoding utf8
