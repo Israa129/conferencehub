@@ -1,0 +1,19 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>🎓 ConférenceHub</h2>
+    <h3>Se connecter</h3>
+
+    <div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+    <form (ngSubmit)="onSubmit()">
+      <input [(ngModel)]="form.email" name="email" type="email" placeholder="Email" required />
+      <input [(ngModel)]="form.password" name="password" type="password" placeholder="Mot de passe" required />
+
+      <button type="submit" [disabled]="chargement">
+        {{ chargement ? 'Connexion...' : 'Se connecter' }}
+      </button>
+    </form>
+
+    <p>Pas de compte ? <a routerLink="/register">S'inscrire</a></p>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>🎓 Créer un compte</h2>
+
+    <div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+    <form (ngSubmit)="onSubmit()">
+      <input [(ngModel)]="form.nom" name="nom" placeholder="Nom" required />
+      <input [(ngModel)]="form.prenom" name="prenom" placeholder="Prénom" required />
+      <input [(ngModel)]="form.email" name="email" type="email" placeholder="Email" required />
+      <input [(ngModel)]="form.password" name="password" type="password" placeholder="Mot de passe" required />
+      <input [(ngModel)]="form.pays" name="pays" placeholder="Pays" />
+
+      <button type="submit" [disabled]="chargement">
+        {{ chargement ? 'Inscription...' : 'S\'inscrire' }}
+      </button>
+    </form>
+
+    <p>Déjà un compte ? <a routerLink="/login">Se connecter</a></p>
+  </div>
+</div>
