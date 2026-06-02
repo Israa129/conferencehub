@@ -16,6 +16,11 @@ class Conference extends Model
         'organisateur_id',
     ];
 
+    protected $casts = [
+        'date_debut' => 'date',
+        'date_fin' => 'date',
+    ];
+
     public function organisateur()
     {
         return $this->belongsTo(User::class, 'organisateur_id');

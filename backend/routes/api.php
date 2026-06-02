@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ConferenceController;
+use App\Http\Controllers\SessionController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -15,6 +17,8 @@ Route::get('/test', function () {
 // Auth publiques
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
+Route::apiResource('conferences', ConferenceController::class);
+Route::apiResource('sessions', SessionController::class);
 
 // Auth protégées
 Route::middleware('auth:sanctum')->group(function () {
