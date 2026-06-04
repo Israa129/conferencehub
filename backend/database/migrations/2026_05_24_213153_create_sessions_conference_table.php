@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('type');
             $table->time('horaire_debut');
             $table->time('horaire_fin');
+            $table->date('date_session');
             $table->integer('capacite');
             $table->foreignId('conference_id')
                 ->constrained('conferences')

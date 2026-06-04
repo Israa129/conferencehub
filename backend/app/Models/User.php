@@ -30,4 +30,43 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function conferences()
+    {
+        return $this->hasMany(Conference::class, 'organisateur_id');
+    }
+
+    public function inscriptions()
+    {
+        return $this->hasMany(Inscription::class);
+    }
+
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isOrganisateur()
+    {
+        return $this->role === 'organisateur';
+    }
+
+    public function isConferencier()
+    {
+        return $this->role === 'conferencier';
+    }
+
+    public function isParticipant()
+    {
+        return $this->role === 'participant';
+    }
 }
