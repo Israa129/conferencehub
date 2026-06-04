@@ -1,0 +1,43 @@
+<div class="dashboard-container">
+
+  <aside class="sidebar">
+    <h2 class="logo">🎓 ConferenceHub</h2>
+
+    <nav>
+      <ul>
+        <li routerLink="/dashboard">🏠 Tableau de bord</li>
+
+        <li routerLink="/my-registrations">
+          📋 Mes inscriptions
+        </li>
+
+        <li routerLink="/qr-code">
+          🔳 Mon QR Code
+        </li>
+
+        <li routerLink="/certificates">
+          📄 Mes attestations
+        </li>
+
+        <li>
+          🌍 Explorer les conférences
+        </li>
+
+        <hr>
+
+        <li routerLink="/profile">
+          👤 Mon profil
+        </li>
+
+        <li routerLink="/settings">
+          ⚙️ Paramètres
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

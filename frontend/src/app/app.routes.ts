@@ -1,9 +1,43 @@
 import { Routes } from '@angular/router';
+
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 
+import { Dashboard } from './features/participant/dashboard/dashboard';
+import { QrCode } from './features/participant/qr-code/qr-code';
+import { Certificates } from './features/participant/certificates/certificates';
+import { Profile } from './features/participant/profile/profile';
+import { Settings } from './features/participant/settings/settings';
+
+import { ParticipantLayout } from './features/participant/participant-layout/participant-layout';
+
 export const routes: Routes = [
+
   { path: '', redirectTo: '/login', pathMatch: 'full' },
+
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+
+  {
+    path: '',
+    component: ParticipantLayout,
+    children: [
+
+      { path: 'dashboard', component: Dashboard },
+
+      {
+        path: 'my-registrations',
+        loadComponent: () =>
+          import('./features/participant/my-registrations/my-registrations')
+            .then(m => m.MyRegistrations)
+      },
+
+      { path: 'qr-code', component: QrCode },
+      { path: 'certificates', component: Certificates },
+      { path: 'profile', component: Profile },
+      { path: 'settings', component: Settings }
+
+    ]
+  }
+
 ];

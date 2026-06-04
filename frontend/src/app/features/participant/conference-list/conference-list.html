@@ -1,0 +1,13 @@
+<h1>Liste des conférences</h1>
+
+<div *ngFor="let conf of conferences">
+
+  <h2>{{ conf.title }}</h2>
+
+  <p>{{ conf.description }}</p>
+
+  <p>{{ conf.location }}</p>
+
+  <p>{{ conf.start_date }}</p>
+
+</div>

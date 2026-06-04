@@ -1,0 +1,38 @@
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.sidebar {
+  width: 260px;
+  background: white;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+}
+
+.logo {
+  color: #4f46e5;
+  margin-bottom: 30px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.sidebar li:hover {
+  background: #eef2ff;
+}
+
+.content {
+  flex: 1;
+  padding: 30px;
+}
