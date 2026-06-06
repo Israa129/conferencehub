@@ -12,22 +12,29 @@ import { AuthService } from '../../../core/services/auth';
   styleUrl: './login.scss'
 })
 export class LoginComponent {
-  form = { email: '', password: '' };
+  form = {
+    email: '',
+    password: '',
+    remember: true
+  };
+
   erreur = '';
   chargement = false;
+  showPassword = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   onSubmit() {
     this.chargement = true;
     this.erreur = '';
+
     this.auth.login(this.form).subscribe({
       next: (res: any) => {
         this.auth.saveToken(res.token, res.user);
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
-        this.erreur = 'Email ou mot de passe incorrect';
+      error: (error) => {
+        this.erreur = error?.error?.message || 'Email ou mot de passe incorrect';
         this.chargement = false;
       }
     });
