@@ -40,68 +40,9 @@
 
     </div>
 
-    <div class="card">
+      <app-conference-list>
+      </app-conference-list>
 
-      <div class="section-header">
-        <div>
-          <h2>Mes conférences</h2>
-          <p>Liste dynamique</p>
-        </div>
-      </div>
-
-      <div class="table-responsive">
-
-        <table class="table align-middle">
-
-          <thead>
-            <tr>
-              <th>Titre</th>
-              <th>Thème</th>
-              <th>Lieu</th>
-              <th>Début</th>
-              <th>Fin</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            <tr *ngFor="let conf of conferences">
-
-              <td><strong>{{ conf.titre }}</strong></td>
-              <td>{{ conf.theme }}</td>
-              <td>{{ conf.lieu }}</td>
-
-              <td>{{ conf.date_debut | date:'dd/MM/yyyy' }}</td>
-              <td>{{ conf.date_fin | date:'dd/MM/yyyy' }}</td>
-
-              <td>
-                <span class="badge badge-blue" *ngIf="isActive(conf)">Active</span>
-                <span class="badge badge-gray" *ngIf="!isActive(conf)">Terminée</span>
-              </td>
-
-              <td class="d-flex gap-2">
-
-                <button class="btn btn-outline btn-sm" (click)="edit(conf)">
-                  Edit
-                </button>
-
-                <button class="btn btn-danger btn-sm" (click)="delete(conf.id)">
-                  Delete
-                </button>
-
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
 
   </main>
 
