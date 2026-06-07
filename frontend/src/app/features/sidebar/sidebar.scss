@@ -1,9 +1,22 @@
-.sidebar-nav {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
   display: flex;
-  flex-direction: column;
-  gap: 4px; 
+  flex-direction: column; // Force l'alignement vertical des éléments
+  height: calc(100vh - 60px); // S'adapte à la hauteur sous la navbar
+  position: sticky;
+  top: 60px;
+  overflow-y: auto;
+}
+
+.sidebar-nav {
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column; // Met les liens les uns sous les autres
+  gap: 8px; 
 
   .nav-item {
     display: flex;

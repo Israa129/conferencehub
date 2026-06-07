@@ -50,4 +50,12 @@ export class ConferenceList implements OnInit {
       c.description?.toLowerCase().includes(q)
     );
   }
+  isActive(conf: Conference): boolean {
+    const now = new Date();
+    return new Date(conf.date_debut) <= now && now <= new Date(conf.date_fin);
+  }
+
+  onEdit(conf: Conference): void {}
+
+  onDelete(id: number): void {}
 }
