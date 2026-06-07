@@ -1,26 +1,3 @@
-// ============================================================
-//  Organisateur Dashboard — styles spécifiques
-//  Complète le style.scss global (Bootstrap + variables maison)
-// ============================================================
-
-// ── Shell layout ────────────────────────────────────────────
-.organisateur-shell {
-  display: flex;
-  min-height: 100vh;
-  background: #f4f3ef;
-}
-
-// ── Sidebar ─────────────────────────────────────────────────
-
-
-.nav-section-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: #9ca3af;
-  letter-spacing: 1px;
-  padding: 0.75rem 0.25rem 0.4rem;
-}
-
 .nav-item {
   display: flex;
   align-items: center;
@@ -31,7 +8,7 @@
   font-weight: 500;
   color: #374151;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: white 0.15s;
   text-decoration: none;
   margin-bottom: 2px;
 
@@ -109,7 +86,6 @@
   .material-icons { color: #9ca3af !important; }
 }
 
-// ── Main content ─────────────────────────────────────────────
 .main-content {
   flex: 1;
   padding: 2rem 2.5rem;
@@ -117,7 +93,6 @@
   min-width: 0;
 }
 
-// ── Status dot ───────────────────────────────────────────────
 .status-dot {
   display: inline-block;
   width: 8px;
@@ -133,7 +108,6 @@
   50%       { opacity: 0.4; }
 }
 
-// ── Dashboard alert ──────────────────────────────────────────
 .dash-alert {
   background: #fffbeb;
   border: 1px solid #fde68a;
@@ -172,7 +146,6 @@
   }
 }
 
-// ── KPI Grid ─────────────────────────────────────────────────
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -206,11 +179,6 @@
   justify-content: center;
 
   .material-icons { font-size: 20px; color: white; }
-
-  &.kpi-blue   { background: #1a56db; }
-  &.kpi-teal   { background: #0d9488; }
-  &.kpi-amber  { background: #d97706; }
-  &.kpi-purple { background: #7c3aed; }
 }
 
 .kpi-tag {
@@ -218,11 +186,6 @@
   font-weight: 600;
   padding: 3px 9px;
   border-radius: 20px;
-
-  &.kpi-tag-green  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-  &.kpi-tag-orange { background: #fff7ed; color: #d97706; border: 1px solid #fed7aa; }
-  &.kpi-tag-red    { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-  &.kpi-tag-gray   { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
 }
 
 .kpi-value {
@@ -274,7 +237,6 @@
   margin-top: 4px;
 }
 
-// ── Conference card ──────────────────────────────────────────
 .conf-card {
   transition: box-shadow 0.2s, transform 0.2s;
 
@@ -284,16 +246,14 @@
   }
 }
 
-// ── Small button variant ──────────────────────────────────────
 .btn-sm {
   padding: 5px 10px !important;
   font-size: 12px !important;
 }
 
-// ── Responsive ───────────────────────────────────────────────
 @media (max-width: 768px) {
   .sidebar {
-    display: none;  // On mobile, hide sidebar (add a hamburger if needed)
+    display: none; 
   }
 
   .main-content {

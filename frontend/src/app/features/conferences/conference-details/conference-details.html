@@ -1,9 +1,5 @@
 @if (!loading && conference) {
 
-  <span class="back-link" routerLink="/conferences">
-    ← Retour aux conférences
-  </span>
-
   <div class="card" style="margin-bottom:1.5rem;">
     <div class="card-accent-bar"></div>
 
@@ -13,24 +9,6 @@
         <span class="badge badge-blue">
           {{ conference.theme }}
         </span>
-
-        <div style="display:flex; gap:8px;">
-          <a
-            [routerLink]="['/conferences', conference.id, 'edit']"
-            class="btn btn-outline"
-            style="font-size:12px; padding:6px 14px;"
-          >
-            ✏ Modifier
-          </a>
-
-          <button
-            class="btn btn-danger"
-            style="font-size:12px; padding:6px 14px;"
-            (click)="delete()"
-          >
-            🗑 Supprimer
-          </button>
-        </div>
       </div>
 
       <h1 style="font-size:1.75rem; margin-bottom:8px;">

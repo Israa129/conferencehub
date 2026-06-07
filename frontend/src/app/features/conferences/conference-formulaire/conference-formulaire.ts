@@ -1,21 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
 import { Conference } from '../../../core/models/Conference';
 
 @Component({
   selector: 'app-conference-formulaire',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './conference-formulaire.html',
   styleUrl: './conference-formulaire.scss',
 })
-export class ConferenceFormulaire { 
+export class ConferenceFormulaire implements OnInit {
   form: FormGroup;
   isEdit = false;
   conferenceId?: number;
- 
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -32,7 +32,7 @@ export class ConferenceFormulaire {
       organisateur_id: [null, Validators.required],
     });
   }
- 
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -45,30 +45,38 @@ export class ConferenceFormulaire {
             description: conf.description,
             theme: conf.theme,
             lieu: conf.lieu,
-            date_debut: conf.date_debut,
-            date_fin: conf.date_fin,
+            date_debut: this.toDateInput(conf.date_debut),
+            date_fin: this.toDateInput(conf.date_fin),
             organisateur_id: conf.organisateur_id,
           });
         },
-        error: (error) => { console.log(error) },
+        error: (error) => { console.log(error); },
       });
     }
   }
- 
+
+  private toDateInput(date: string | Date): string {
+    if (!date) return '';
+    return new Date(date).toISOString().split('T')[0];
+  }
+
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+
     const payload = this.form.value;
- 
+
     const obs = this.isEdit && this.conferenceId
       ? this.conferenceService.update(this.conferenceId, payload)
       : this.conferenceService.create(payload);
- 
+
     obs.subscribe({
-      next: (conf) => this.router.navigate(['/conferences', conf.id])    });
+      next: (conf) => this.router.navigate(['/conferences', conf.id]),
+      error: (err) => console.error(err),
+    });
   }
- 
+
   get f() { return this.form.controls; }
 }

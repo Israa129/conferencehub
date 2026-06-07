@@ -5,17 +5,18 @@
   background: white;
   border-right: 1px solid #e5e7eb;
   display: flex;
-  flex-direction: column; // Force l'alignement vertical des éléments
-  height: calc(100vh - 60px); // S'adapte à la hauteur sous la navbar
+  flex-direction: column; 
+  height: calc(100vh - 60px);
   position: sticky;
   top: 60px;
   overflow-y: auto;
+  
 }
 
 .sidebar-nav {
   padding: 1rem 0.75rem;
   display: flex;
-  flex-direction: column; // Met les liens les uns sous les autres
+  flex-direction: column; 
   gap: 8px; 
 
   .nav-item {
