@@ -273,6 +273,16 @@ a {
     font-size: 13px;
   }
 }
+.app-layout {
+  display: flex;
+  width: 100%;
+}
+.app-main-content {
+  flex: 1; 
+  overflow-y: auto;
+  background: #f4f3ef;
+  padding: 2rem 1.5rem;
+}
 
 /* Responsive */
 @media (max-width: 640px) {

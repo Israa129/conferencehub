@@ -3,13 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Conference } from '../../../core/models/Conference';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
-import { Sidebar } from "../../sidebar/sidebar";
 import { ConferenceList } from '../../conferences/conference-list/conference-list';
 
 @Component({
   selector: 'app-organisateur-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, Sidebar, ConferenceList],
+  imports: [CommonModule, FormsModule, ConferenceList],
   templateUrl: './organisateur-dashboard.html',
   styleUrl: './organisateur-dashboard.scss',
 })
