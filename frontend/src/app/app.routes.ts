@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { ConferencierDashboardComponent } from './conferencier/conferencier-dashboard/conferencier-dashboard.component';
 
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
@@ -48,4 +49,24 @@ export const routes: Routes = [
   { path: 'organisateur', component: OrganisateurDashboard },
 
 
+export const routes: Routes = [
+  {
+    path: 'conferencier',
+    children: [
+      {
+        path: 'dashboard',
+        component: ConferencierDashboardComponent
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
+  },
+  {
+    path: '',
+    redirectTo: '/conferencier/dashboard',
+    pathMatch: 'full'
+  }
 ];
