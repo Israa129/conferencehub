@@ -42,7 +42,6 @@ export const routes: Routes = [
     ]
   },
 
-  { path: 'conferences', component: ConferenceList },
   { path: 'conferences/new', component: ConferenceFormulaire },
   { path: 'conferences/:id', component: ConferenceDetails },
   { path: 'conferences/:id/edit', component: ConferenceFormulaire },

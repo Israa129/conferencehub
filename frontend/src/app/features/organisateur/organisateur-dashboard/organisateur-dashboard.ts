@@ -43,10 +43,6 @@ export class OrganisateurDashboard implements OnInit {
     });
   }
 
-  openCreate(): void {
-    
-  }
-
   edit(conf: Conference): void {
    
   }
