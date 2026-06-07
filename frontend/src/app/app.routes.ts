@@ -13,6 +13,7 @@ import { Certificates } from './features/participant/certificates/certificates';
 import { Profile } from './features/participant/profile/profile';
 import { Settings } from './features/participant/settings/settings';
 import { ParticipantLayout } from './features/participant/participant-layout/participant-layout';
+import { OrganisateurDashboard } from './features/organisateur/organisateur-dashboard/organisateur-dashboard';
 
 export const routes: Routes = [
 
@@ -44,6 +45,8 @@ export const routes: Routes = [
   { path: 'conferences', component: ConferenceList },
   { path: 'conferences/new', component: ConferenceFormulaire },
   { path: 'conferences/:id', component: ConferenceDetails },
-  { path: 'conferences/:id/edit', component: ConferenceFormulaire }
+  { path: 'conferences/:id/edit', component: ConferenceFormulaire },
+  { path: 'organisateur', component: OrganisateurDashboard },
+
 
 ];
