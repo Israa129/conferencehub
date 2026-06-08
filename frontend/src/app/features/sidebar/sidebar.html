@@ -1,17 +1,96 @@
-<aside class="sidebar">
+<aside class="sidebar" *ngIf="isLoggedIn">
+
+  <!-- Profil utilisateur -->
+  <div class="sidebar-profile">
+    <div class="avatar">
+      {{ user?.prenom?.charAt(0) }}{{ user?.nom?.charAt(0) }}
+    </div>
+    <div class="user-info">
+      <span class="user-name">{{ user?.prenom }} {{ user?.nom }}</span>
+      <span class="user-role">{{ user?.role | titlecase }}</span>
+    </div>
+  </div>
 
   <nav class="sidebar-nav">
 
-    <a class="nav-item active">
-      <span class="material-icons">dashboard</span>
-      Vue d'ensemble
-    </a>
+    <!-- ── PARTICIPANT ── -->
+    <ng-container *ngIf="user?.role === 'participant'">
+      <a class="nav-item" routerLink="/participant/dashboard" routerLinkActive="active">
+        <span>🏠</span> Tableau de bord
+      </a>
+      <a class="nav-item" routerLink="/participant/conferences" routerLinkActive="active">
+        <span>🎓</span> Conférences
+      </a>
+      <a class="nav-item" routerLink="/participant/my-registrations" routerLinkActive="active">
+        <span>📋</span> Mes inscriptions
+      </a>
+      <a class="nav-item" routerLink="/participant/qr-code" routerLinkActive="active">
+        <span>📱</span> Mon QR Code
+      </a>
+      <a class="nav-item" routerLink="/participant/attestations" routerLinkActive="active">
+        <span>📜</span> Mes attestations
+      </a>
+    </ng-container>
 
-    <a class="nav-item">
-      <span class="material-icons">event</span>
-      Conférences
+    <!-- ── CONFÉRENCIER ── -->
+    <ng-container *ngIf="user?.role === 'conferencier'">
+      <a class="nav-item" routerLink="/conferencier/dashboard" routerLinkActive="active">
+        <span>🏠</span> Tableau de bord
+      </a>
+      <a class="nav-item" routerLink="/conferencier/articles" routerLinkActive="active">
+        <span>📄</span> Mes articles
+      </a>
+      <a class="nav-item" routerLink="/conferencier/soumettre" routerLinkActive="active">
+        <span>➕</span> Soumettre un article
+      </a>
+      <a class="nav-item" routerLink="/conferencier/archives" routerLinkActive="active">
+        <span>🗂️</span> Archives
+      </a>
+    </ng-container>
+
+    <!-- ── ORGANISATEUR ── -->
+    <ng-container *ngIf="user?.role === 'organisateur'">
+      <a class="nav-item" routerLink="/organisateur/dashboard" routerLinkActive="active">
+        <span>🏠</span> Tableau de bord
+      </a>
+      <a class="nav-item" routerLink="/organisateur/conferences" routerLinkActive="active">
+        <span>🎓</span> Mes conférences
+      </a>
+      <a class="nav-item" routerLink="/organisateur/sessions" routerLinkActive="active">
+        <span>📅</span> Sessions
+      </a>
+      <a class="nav-item" routerLink="/organisateur/soumissions" routerLinkActive="active">
+        <span>📄</span> Soumissions
+      </a>
+      <a class="nav-item" routerLink="/organisateur/statistiques" routerLinkActive="active">
+        <span>📊</span> Statistiques
+      </a>
+    </ng-container>
+
+    <!-- ── ADMIN ── -->
+    <ng-container *ngIf="user?.role === 'admin'">
+      <a class="nav-item" routerLink="/admin/dashboard" routerLinkActive="active">
+        <span>🏠</span> Vue d'ensemble
+      </a>
+      <a class="nav-item" routerLink="/admin/utilisateurs" routerLinkActive="active">
+        <span>👥</span> Utilisateurs
+      </a>
+      <a class="nav-item" routerLink="/admin/conferences" routerLinkActive="active">
+        <span>🎓</span> Conférences
+      </a>
+      <a class="nav-item" routerLink="/admin/roles" routerLinkActive="active">
+        <span>🔑</span> Rôles & Permissions
+      </a>
+    </ng-container>
+
+    <!-- ── COMMUN ── -->
+    <div class="sidebar-divider"></div>
+    <a class="nav-item" routerLink="/profile" routerLinkActive="active">
+      <span>👤</span> Mon profil
+    </a>
+    <a class="nav-item logout" (click)="logout()">
+      <span>🚪</span> Déconnexion
     </a>
 
   </nav>
-
 </aside>

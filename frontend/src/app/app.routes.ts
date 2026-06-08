@@ -3,6 +3,7 @@ import { ConferencierDashboardComponent } from './conferencier/conferencier-dash
 
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+import { HomeComponent } from './features/home/home/home';
 
 import { ConferenceFormulaire } from './features/conferences/conference-formulaire/conference-formulaire';
 import { ConferenceDetails } from './features/conferences/conference-details/conference-details';
@@ -18,24 +19,22 @@ import { OrganisateurDashboard } from './features/organisateur/organisateur-dash
 
 export const routes: Routes = [
 
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', component: HomeComponent, pathMatch: 'full' },
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
 
   {
-    path: '',
+    path: 'participant',
     component: ParticipantLayout,
     children: [
       { path: 'dashboard', component: Dashboard },
-
       {
         path: 'my-registrations',
         loadComponent: () =>
           import('./features/participant/my-registrations/my-registrations')
             .then(m => m.MyRegistrations)
       },
-
       { path: 'qr-code', component: QrCode },
       { path: 'certificates', component: Certificates },
       { path: 'profile', component: Profile },
@@ -48,8 +47,6 @@ export const routes: Routes = [
   { path: 'conferences/:id/edit', component: ConferenceFormulaire },
   { path: 'organisateur', component: OrganisateurDashboard },
 
-
-export const routes: Routes = [
   {
     path: 'conferencier',
     children: [

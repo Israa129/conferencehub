@@ -1,7 +1,66 @@
-<nav class="navbar">
-  <a class="navbar-brand" routerLink="/">ConferenceHub</a>
-  <div class="nav-links">
+<nav class="navbar" [class.navbar-auth]="isAuthPage">
+
+  <!-- Logo (toujours visible) -->
+  <a class="navbar-brand" routerLink="/">
+    <div class="brand-icon">🏛️</div>
+    <div class="brand-text">
+      <span class="brand-name">ConferenceHub</span>
+      <span class="brand-sub" *ngIf="!isAuthPage">Plateforme académique</span>
+    </div>
+  </a>
+
+  <!-- Liens visibles uniquement hors auth -->
+  <div class="nav-links" *ngIf="!isAuthPage">
     <a routerLink="/conferences" routerLinkActive="active">Conférences</a>
-    <!-- <a routerLink="/sessions" routerLinkActive="active">Sessions</a> -->
+    <a routerLink="/appels" routerLinkActive="active">Appels à communications</a>
+    <a routerLink="/institutions" routerLinkActive="active">Institutions</a>
+    <a routerLink="/contact" routerLinkActive="active">Contact</a>
   </div>
+
+  <!-- Actions NON connecté -->
+  <div class="nav-actions" *ngIf="!isLoggedIn">
+
+    <!-- Page login → montrer seulement S'inscrire -->
+    <ng-container *ngIf="isAuthPage">
+      <a routerLink="/login" class="btn-login">Se connecter</a>
+      <a routerLink="/register" class="btn-register">S'inscrire</a>
+    </ng-container>
+
+    <!-- Autres pages → montrer les deux -->
+    <ng-container *ngIf="!isAuthPage">
+      <a routerLink="/login" class="btn-login">Se connecter</a>
+      <a routerLink="/register" class="btn-register">S'inscrire</a>
+    </ng-container>
+
+  </div>
+
+  <!-- Actions CONNECTÉ (jamais sur auth pages) -->
+  <div class="nav-user" *ngIf="isLoggedIn && !isAuthPage">
+
+    <ng-container *ngIf="user?.role === 'participant'">
+      <a routerLink="/participant/dashboard" routerLinkActive="active">Mon espace</a>
+    </ng-container>
+    <ng-container *ngIf="user?.role === 'conferencier'">
+      <a routerLink="/conferencier/dashboard" routerLinkActive="active">Mes articles</a>
+    </ng-container>
+    <ng-container *ngIf="user?.role === 'organisateur'">
+      <a routerLink="/organisateur/dashboard" routerLinkActive="active">Mes conférences</a>
+    </ng-container>
+    <ng-container *ngIf="user?.role === 'admin'">
+      <a routerLink="/admin/dashboard" routerLinkActive="active">Administration</a>
+    </ng-container>
+
+    <div class="user-menu">
+      <div class="avatar">
+        {{ user?.prenom?.charAt(0) }}{{ user?.nom?.charAt(0) }}
+      </div>
+      <div class="dropdown">
+        <span class="user-name">{{ user?.prenom }} {{ user?.nom }}</span>
+        <a routerLink="/profile" class="dropdown-item">Mon profil</a>
+        <button (click)="logout()" class="dropdown-item logout">Déconnexion</button>
+      </div>
+    </div>
+
+  </div>
+
 </nav>

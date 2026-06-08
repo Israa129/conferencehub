@@ -1,9 +1,15 @@
+<!-- Navbar toujours visible -->
 <app-navbar></app-navbar>
 
-<div class="app-layout">
+<!-- Layout avec sidebar uniquement si connecté et hors auth -->
+<div class="app-layout" *ngIf="showLayout">
   <app-sidebar></app-sidebar>
-  
   <main class="app-main-content">
     <router-outlet></router-outlet>
   </main>
+</div>
+
+<!-- Pages sans sidebar (auth, accueil) -->
+<div *ngIf="!showLayout">
+  <router-outlet></router-outlet>
 </div>
