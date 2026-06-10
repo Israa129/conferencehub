@@ -1,0 +1,287 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-icon">🎓</div>
+      <div>
+        <div class="sidebar__brand-name">ConferenceHub</div>
+        <div class="sidebar__brand-sub">Espace Conférencier</div>
+      </div>
+    </div>
+
+    <div class="sidebar__user">
+      <div class="avatar">{{ user.initiales }}</div>
+      <div>
+        <div class="sidebar__user-name">{{ user.nom }}</div>
+        <div class="sidebar__user-role">{{ user.role }}</div>
+      </div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <div class="sidebar__nav-label">Navigation</div>
+        <a class="sidebar__nav-item sidebar__nav-item--active">
+            🏠 Tableau de bord
+            </a>
+            <a class="sidebar__nav-item" (click)="setFiltreStatut('tous'); $event.stopPropagation()">
+            📄 Mes soumissions
+            <span class="badge">{{ stats().total }}</span>
+            </a>
+            <a class="sidebar__nav-item" (click)="ouvrirModal(); $event.stopPropagation()">
+            ➕ Soumettre un article
+            </a>
+            <a class="sidebar__nav-item">🔔 Notifications</a>
+            <a class="sidebar__nav-item">👤 Mon profil</a>
+        </nav>
+
+    <div class="sidebar__logout">
+      <a class="sidebar__nav-item sidebar__nav-item--logout">↩ Se déconnecter</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div>
+        <h1 class="topbar__title">Mes soumissions d'articles</h1>
+        <p class="topbar__sub">Suivi et gestion de vos communications scientifiques</p>
+      </div>
+      <div class="topbar__actions">
+        <button class="btn btn--primary" (click)="ouvrirModal(); $event.stopPropagation()">
+        + Soumettre un article
+        </button>
+        <div class="avatar topbar__avatar">{{ user.initiales }}</div>
+      </div>
+    </header>
+
+    <!-- Alertes -->
+    <div *ngIf="successMsg()" class="alert alert--success">✓ {{ successMsg() }}</div>
+    <div *ngIf="error()" class="alert alert--error">⚠ {{ error() }}</div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card stat-card--total" (click)="setFiltreStatut('tous')">
+        <div class="stat-card__label">Total soumis</div>
+        <div class="stat-card__value">{{ stats().total }}</div>
+        <div class="stat-card__sub">Articles soumis</div>
+      </div>
+      <div class="stat-card stat-card--revision" (click)="setFiltreStatut('en_revision')">
+        <div class="stat-card__label">En révision</div>
+        <div class="stat-card__value">{{ stats().en_revision }}</div>
+        <div class="stat-card__sub">En cours d'évaluation</div>
+      </div>
+      <div class="stat-card stat-card--accepte" (click)="setFiltreStatut('accepte')">
+        <div class="stat-card__label">Acceptés</div>
+        <div class="stat-card__value">{{ stats().accepte }}</div>
+        <div class="stat-card__sub">Prêts pour publication</div>
+      </div>
+      <div class="stat-card stat-card--refuse" (click)="setFiltreStatut('refuse')">
+        <div class="stat-card__label">Refusés</div>
+        <div class="stat-card__value">{{ stats().refuse }}</div>
+        <div class="stat-card__sub">Avec commentaires</div>
+      </div>
+    </div>
+
+    <!-- Banner accepté -->
+    <div *ngIf="articleAccepte()" class="banner-accepted">
+      <span>🎉</span>
+      <div>
+        <strong>Votre article "{{ articleAccepte()!.titre }}" a été accepté !</strong>
+        <div *ngIf="articleAccepte()!.session_assignee" class="banner-accepted__sub">
+          {{ articleAccepte()!.conference_nom }} · Session {{ articleAccepte()!.session_assignee }}
+        </div>
+      </div>
+      <button class="btn btn--ghost" (click)="voirDetail(articleAccepte()!)">Voir détails →</button>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-card">
+      <div class="table-card__header">
+        <h2 class="table-card__title">Toutes mes soumissions</h2>
+        <div class="table-card__filters">
+          <select class="filter-select" (change)="setFiltreStatut($any($event.target).value)">
+            <option value="tous">Tous les statuts</option>
+            <option value="en_revision">En révision</option>
+            <option value="accepte">Accepté</option>
+            <option value="refuse">Refusé</option>
+          </select>
+          <select class="filter-select" (change)="setFiltreStatut($any($event.target).value)">
+            <option value="toutes">Toutes les conférences</option>
+            <option *ngFor="let c of conferencesDisponibles()" [value]="c.id">{{ c.nom }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="loading()" class="loading-state">
+        <div class="spinner"></div> Chargement…
+      </div>
+
+      <div *ngIf="!loading()" class="table-wrapper">
+        <table class="table" *ngIf="articlesFiltres().length > 0">
+          <thead>
+            <tr>
+              <th>Article</th>
+              <th>Conférence</th>
+              <th>Soumis le</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let article of articlesFiltres(); trackBy: trackById" class="table__row">
+              <td class="table__cell-article">
+                <div class="article-title">{{ article.titre }}</div>
+                <div class="article-tags">
+                  <span class="tag" *ngFor="let mot of article.mots_cles.slice(0,3)">{{ mot }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="conf-name">{{ article.conference_nom }}</div>
+                <div class="conf-lieu">{{ article.conference_lieu }}</div>
+              </td>
+              <td class="table__cell-date">{{ formatDate(article.created_at) }}</td>
+              <td>
+                <span class="statut-badge statut-badge--{{ article.statut }}">
+                  {{ statutLabel(article.statut) }}
+                </span>
+              </td>
+              <td class="table__cell-actions">
+                <button class="action-btn" (click)="voirDetail(article)">Voir</button>
+                <button class="action-btn action-btn--secondary"
+                  *ngIf="article.statut === 'en_revision'"
+                  (click)="ouvrirModal(article)">Modifier</button>
+                <button class="action-btn action-btn--danger"
+                  *ngIf="article.statut === 'en_revision'"
+                  (click)="confirmerSuppression(article)">🗑</button>
+                <button class="action-btn action-btn--ghost" (click)="telecharger(article)">⬇</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="articlesFiltres().length === 0" class="empty-state">
+          <p>📄 Aucun article trouvé.</p>
+          <button class="btn btn--primary" (click)="ouvrirModal()">Soumettre votre premier article</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PANEL DETAIL -->
+  <div class="overlay" *ngIf="showDetailPanel()" (click)="fermerDetail()"></div>
+  <aside class="detail-panel" [class.detail-panel--open]="showDetailPanel()" *ngIf="selectedArticle()">
+    <div class="detail-panel__header">
+      <h3>Détail de l'article</h3>
+      <button class="icon-btn" (click)="fermerDetail()">✕</button>
+    </div>
+    <div class="detail-panel__body">
+      <span class="statut-badge statut-badge--{{ selectedArticle()!.statut }}">
+        {{ statutLabel(selectedArticle()!.statut) }}
+      </span>
+      <h2 class="detail-title">{{ selectedArticle()!.titre }}</h2>
+      <div class="detail-section">
+        <div class="detail-label">Résumé</div>
+        <p class="detail-text">{{ selectedArticle()!.resume }}</p>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">Mots-clés</div>
+        <div class="article-tags">
+          <span class="tag" *ngFor="let mot of selectedArticle()!.mots_cles">{{ mot }}</span>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">Conférence</div>
+        <div class="detail-text">{{ selectedArticle()!.conference_nom }} — {{ selectedArticle()!.conference_lieu }}</div>
+      </div>
+      <div class="detail-section" *ngIf="selectedArticle()!.commentaires">
+        <div class="detail-label">Commentaires</div>
+        <div class="detail-comment">{{ selectedArticle()!.commentaires }}</div>
+      </div>
+      <button class="btn btn--primary btn--full" (click)="telecharger(selectedArticle()!)">⬇ Télécharger PDF</button>
+    </div>
+  </aside>
+
+  <!-- MODAL SOUMISSION -->
+  <div class="modal-backdrop" *ngIf="showModal()" (click)="fermerModal()"></div>
+  <div class="modal" *ngIf="showModal()">
+    <div class="modal__header">
+      <h3>{{ editingArticle() ? 'Modifier l\'article' : 'Soumettre un article' }}</h3>
+      <button class="icon-btn" (click)="fermerModal()">✕</button>
+    </div>
+    <div class="modal__body">
+      <form [formGroup]="articleForm" (ngSubmit)="soumettre()">
+        <div class="form-group">
+          <label class="form-label">Titre *</label>
+          <input class="form-input" type="text" formControlName="titre" placeholder="Titre de l'article">
+          <div class="form-error" *ngIf="articleForm.get('titre')?.invalid && articleForm.get('titre')?.touched">
+            Le titre est requis.
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Résumé *</label>
+          <textarea class="form-input form-textarea" formControlName="resume" rows="4" placeholder="Résumé de l'article…"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mots-clés * <span class="form-hint-inline">(séparés par virgules)</span></label>
+          <input class="form-input" type="text" formControlName="mots_cles" placeholder="Ex: IA, Deep Learning, CNN">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ID Conférence *</label>
+          <input class="form-input" type="text" formControlName="conference_id" placeholder="ID de la conférence">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom de la conférence</label>
+          <input class="form-input" type="text" formControlName="conference_nom" placeholder="Ex: ICIA 2025">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lieu</label>
+          <input class="form-input" type="text" formControlName="conference_lieu" placeholder="Ex: Paris, France">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fichier PDF {{ editingArticle() ? '(laisser vide pour conserver)' : '*' }}</label>
+          <div class="dropzone"
+            [class.dropzone--active]="dragOver()"
+            [class.dropzone--filled]="selectedFile"
+            (dragover)="$event.preventDefault(); dragOver.set(true)"
+            (dragleave)="dragOver.set(false)"
+            (drop)="onFileDrop($event)">
+            <input type="file" accept=".pdf" class="dropzone__input" (change)="onFileSelect($event)" #fileInput>
+            <div *ngIf="!selectedFile" class="dropzone__content" (click)="fileInput.click()">
+              <p>📎 Glisser-déposer ou <span>cliquer</span> pour sélectionner</p>
+              <small>PDF uniquement · Max 10 MB</small>
+            </div>
+            <div *ngIf="selectedFile" class="dropzone__file">
+              📄 {{ selectedFile.name }}
+              <button type="button" class="icon-btn" (click)="selectedFile = null">✕</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" (click)="fermerModal()">Annuler</button>
+          <button type="submit" class="btn btn--primary" [disabled]="loadingSubmit()">
+            {{ editingArticle() ? 'Mettre à jour' : 'Soumettre' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONFIRM DELETE -->
+<div class="modal-backdrop" *ngIf="showDeleteConfirm()" (click)="showDeleteConfirm.set(false)"></div>
+<div class="modal modal--sm" *ngIf="showDeleteConfirm()">
+  <div class="modal__header">
+    <h3>Confirmer la suppression</h3>
+    <button class="icon-btn" (click)="showDeleteConfirm.set(false)">✕</button>
+  </div>
+  <div class="modal__body">
+    <p>Supprimer <strong>"{{ articleToDelete()?.titre }}"</strong> ? Action irréversible.</p>
+    <div class="modal__actions">
+      <button class="btn btn--ghost" (click)="showDeleteConfirm.set(false)">Annuler</button>
+      <button class="btn btn--danger" (click)="supprimerArticle()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+</div>

@@ -2,27 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Article extends Model
-{
-    protected $fillable = [
-        'titre',
-        'resume',
-        'statut',
-        'user_id',
-        'session_id',
-    ];
-
-    public function auteur()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function sessionConference()
-    {
-        return $this->belongsTo(SessionConference::class, 'session_id');
-use MongoDB\Laravel\Eloquent\Model; // <-- Déjà correct !
+use MongoDB\Laravel\Eloquent\Model;
 
 class Article extends Model
 {
@@ -34,7 +14,7 @@ class Article extends Model
         'resume',
         'mots_cles',
         'fichier_pdf',
-        'statut',           // 'en_revision' | 'accepte' | 'refuse'
+        'statut',
         'commentaires',
         'conference_id',
         'conference_nom',
@@ -51,13 +31,11 @@ class Article extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Scope par conférencier
-    public function scopeByConferencier($query, $conferencierId)
+    public function scopeByConferencier($query, $id)
     {
-        return $query->where('conferencier_id', $conferencierId);
+        return $query->where('conferencier_id', $id);
     }
 
-    // Scope par statut
     public function scopeByStatut($query, $statut)
     {
         return $query->where('statut', $statut);

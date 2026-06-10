@@ -1,16 +1,16 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ArticleService, Article, ArticleStats } from '../../services/article.service';
+import { ArticleService, Article, ArticleStats } from '../services/article';
 
 @Component({
   selector: 'app-conferencier-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './conferencier-dashboard.component.html',
-  styleUrls: ['./conferencier-dashboard.component.scss']
+  templateUrl: './conferencier-dashboard.html',
+  styleUrl: './conferencier-dashboard.scss'
 })
-export class ConferencierDashboardComponent implements OnInit {
+export class ConferencierDashboard implements OnInit {
 
   articles = signal<Article[]>([]);
   stats = signal<ArticleStats>({ total: 0, en_revision: 0, accepte: 0, refuse: 0, par_conference: {} });
@@ -28,7 +28,6 @@ export class ConferencierDashboardComponent implements OnInit {
   filtreStatut = signal('tous');
   filtreConference = signal('toutes');
   dragOver = signal(false);
-
   selectedFile: File | null = null;
   articleForm: FormGroup;
 
@@ -36,18 +35,19 @@ export class ConferencierDashboardComponent implements OnInit {
 
   articlesFiltres = computed(() => {
     let list = this.articles();
-    if (this.filtreStatut() !== 'tous') list = list.filter(a => a.statut === this.filtreStatut());
-    if (this.filtreConference() !== 'toutes') list = list.filter(a => a.conference_id === this.filtreConference());
-    return list;
+    if (this.filtreStatut() === 'tous') return list;
+    list = list.filter(a => a.statut === this.filtreStatut());
+    if (this.filtreConference() === 'toutes') return list;
+    return list.filter(a => a.conference_id === this.filtreConference());
   });
 
   conferencesDisponibles = computed(() => {
     const ids = new Set<string>();
-    const result: { id: string; nom: string; lieu: string }[] = [];
+    const result: { id: string; nom: string }[] = [];
     for (const a of this.articles()) {
       if (!ids.has(a.conference_id)) {
         ids.add(a.conference_id);
-        result.push({ id: a.conference_id, nom: a.conference_nom, lieu: a.conference_lieu });
+        result.push({ id: a.conference_id, nom: a.conference_nom });
       }
     }
     return result;
@@ -72,15 +72,8 @@ export class ConferencierDashboardComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     this.articleService.getArticles().subscribe({
-      next: (res) => {
-        this.articles.set(res.data);
-        this.stats.set(res.stats);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set('Erreur lors du chargement.');
-        this.loading.set(false);
-      }
+      next: (res) => { this.articles.set(res.data); this.stats.set(res.stats); this.loading.set(false); },
+      error: () => { this.error.set('Erreur lors du chargement.'); this.loading.set(false); }
     });
   }
 
@@ -89,11 +82,10 @@ export class ConferencierDashboardComponent implements OnInit {
     if (article) {
       this.editingArticle.set(article);
       this.articleForm.patchValue({
-        titre:           article.titre,
-        resume:          article.resume,
-        mots_cles:       article.mots_cles.join(', '),
-        conference_id:   article.conference_id,
-        conference_nom:  article.conference_nom,
+        titre: article.titre, resume: article.resume,
+        mots_cles: article.mots_cles.join(', '),
+        conference_id: article.conference_id,
+        conference_nom: article.conference_nom,
         conference_lieu: article.conference_lieu,
       });
     } else {
@@ -135,12 +127,10 @@ export class ConferencierDashboardComponent implements OnInit {
     fd.append('conference_id', v.conference_id);
     fd.append('conference_nom', v.conference_nom ?? '');
     fd.append('conference_lieu', v.conference_lieu ?? '');
-    const mots = (v.mots_cles as string).split(',').map((m: string) => m.trim()).filter(Boolean);
-    mots.forEach((m: string) => fd.append('mots_cles[]', m));
+    (v.mots_cles as string).split(',').map((m: string) => m.trim()).filter(Boolean)
+      .forEach((m: string) => fd.append('mots_cles[]', m));
     if (this.selectedFile) fd.append('fichier_pdf', this.selectedFile);
-    const obs$ = editing
-      ? this.articleService.modifier(editing._id, fd)
-      : this.articleService.soumettre(fd);
+    const obs$ = editing ? this.articleService.modifier(editing._id, fd) : this.articleService.soumettre(fd);
     obs$.subscribe({
       next: (res) => {
         this.successMsg.set(res.message);
@@ -149,10 +139,7 @@ export class ConferencierDashboardComponent implements OnInit {
         this.chargerArticles();
         setTimeout(() => this.successMsg.set(null), 4000);
       },
-      error: () => {
-        this.error.set('Erreur lors de la soumission.');
-        this.loadingSubmit.set(false);
-      }
+      error: () => { this.error.set('Erreur lors de la soumission.'); this.loadingSubmit.set(false); }
     });
   }
 
@@ -176,43 +163,27 @@ export class ConferencierDashboardComponent implements OnInit {
     });
   }
 
-  voirDetail(article: Article): void {
-    this.selectedArticle.set(article);
-    this.showDetailPanel.set(true);
-  }
-
-  fermerDetail(): void {
-    this.showDetailPanel.set(false);
-    this.selectedArticle.set(null);
-  }
+  voirDetail(article: Article): void { this.selectedArticle.set(article); this.showDetailPanel.set(true); }
+  fermerDetail(): void { this.showDetailPanel.set(false); this.selectedArticle.set(null); }
 
   telecharger(article: Article): void {
     this.articleService.telechargerPdf(article._id).subscribe(blob => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = article.titre + '.pdf';
-      a.click();
+      a.href = url; a.download = article.titre + '.pdf'; a.click();
       URL.revokeObjectURL(url);
     });
   }
 
   setFiltreStatut(statut: string): void { this.filtreStatut.set(statut); }
-  setFiltreConference(id: string): void { this.filtreConference.set(id); }
 
   statutLabel(statut: string): string {
-    const labels: Record<string, string> = {
-      en_revision: 'En revision',
-      accepte: 'Accepte',
-      refuse: 'Refuse'
-    };
+    const labels: Record<string, string> = { en_revision: 'En révision', accepte: 'Accepté', refuse: 'Refusé' };
     return labels[statut] ?? statut;
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      day: 'numeric', month: 'short', year: 'numeric'
-    });
+    return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   trackById(_: number, item: Article): string { return item._id; }

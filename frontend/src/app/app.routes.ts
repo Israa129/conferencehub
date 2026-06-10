@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { ConferencierDashboardComponent } from './conferencier/conferencier-dashboard/conferencier-dashboard.component';
 
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
@@ -9,16 +8,19 @@ import { ConferenceFormulaire } from './features/conferences/conference-formulai
 import { ConferenceDetails } from './features/conferences/conference-details/conference-details';
 import { ConferenceList } from './features/conferences/conference-list/conference-list';
 
+import { ConferencierDashboard } from './features/conferencier/conferencier-dashboard/conferencier-dashboard';
+import { ConferencierLayout } from './features/conferencier/conferencier-layout/conferencier-layout';
+
 import { Dashboard } from './features/participant/dashboard/dashboard';
 import { QrCode } from './features/participant/qr-code/qr-code';
 import { Certificates } from './features/participant/certificates/certificates';
 import { Profile } from './features/participant/profile/profile';
 import { Settings } from './features/participant/settings/settings';
 import { ParticipantLayout } from './features/participant/participant-layout/participant-layout';
+
 import { OrganisateurDashboard } from './features/organisateur/organisateur-dashboard/organisateur-dashboard';
 
 export const routes: Routes = [
-
   { path: '', component: HomeComponent, pathMatch: 'full' },
 
   { path: 'login', component: LoginComponent },
@@ -45,25 +47,15 @@ export const routes: Routes = [
   { path: 'conferences/new', component: ConferenceFormulaire },
   { path: 'conferences/:id', component: ConferenceDetails },
   { path: 'conferences/:id/edit', component: ConferenceFormulaire },
+
   { path: 'organisateur', component: OrganisateurDashboard },
 
   {
     path: 'conferencier',
+    component: ConferencierLayout,
     children: [
-      {
-        path: 'dashboard',
-        component: ConferencierDashboardComponent
-      },
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      }
+      { path: 'dashboard', component: ConferencierDashboard },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-  {
-    path: '',
-    redirectTo: '/conferencier/dashboard',
-    pathMatch: 'full'
-  }
 ];
