@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { ConferencierDashboardComponent } from './conferencier/conferencier-dashboard/conferencier-dashboard.component';
 
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
@@ -16,6 +15,10 @@ import { Profile } from './features/participant/profile/profile';
 import { Settings } from './features/participant/settings/settings';
 import { ParticipantLayout } from './features/participant/participant-layout/participant-layout';
 import { OrganisateurDashboard } from './features/organisateur/organisateur-dashboard/organisateur-dashboard';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
+import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
+
 
 export const routes: Routes = [
 
@@ -23,6 +26,8 @@ export const routes: Routes = [
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
 
   {
     path: 'participant',
@@ -46,24 +51,5 @@ export const routes: Routes = [
   { path: 'conferences/:id', component: ConferenceDetails },
   { path: 'conferences/:id/edit', component: ConferenceFormulaire },
   { path: 'organisateur', component: OrganisateurDashboard },
-
-  {
-    path: 'conferencier',
-    children: [
-      {
-        path: 'dashboard',
-        component: ConferencierDashboardComponent
-      },
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      }
-    ]
-  },
-  {
-    path: '',
-    redirectTo: '/conferencier/dashboard',
-    pathMatch: 'full'
-  }
+  { path: 'admin/dashboard', component: AdminDashboardComponent },
 ];

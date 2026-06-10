@@ -28,12 +28,14 @@ export class RegisterComponent {
     this.chargement = true;
     this.erreur = '';
     this.auth.register(this.form).subscribe({
-      next: (res: any) => {
-        this.auth.saveToken(res.token, res.user);
-        this.router.navigate(['/dashboard']);
+      next: () => {
+        // ✅ Inscription réussie → page Login avec message
+        this.router.navigate(['/login'], {
+          queryParams: { registered: 'success' }
+        });
       },
       error: (err) => {
-        this.erreur = 'Erreur lors de l\'inscription';
+        this.erreur = err.error?.message || 'Erreur lors de l\'inscription';
         this.chargement = false;
       }
     });

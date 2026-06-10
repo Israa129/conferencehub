@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../core/services/auth';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { UserStateService } from '../../core/services/user-state';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,19 +11,34 @@ import { AuthService } from '../../core/services/auth';
   styleUrl: './sidebar.scss',
 })
 export class Sidebar implements OnInit {
-  isLoggedIn = false;
-  user: any = null;
+  showSidebar = false;
 
-  constructor(private auth: AuthService) {}
+  constructor(
+    public userState: UserStateService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.isLoggedIn = this.auth.isLoggedIn();
-    this.user = this.auth.getUser();
+    this.checkSidebar(this.router.url);
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.checkSidebar(event.url);
+        this.userState.refresh();
+      }
+    });
+  }
+
+  checkSidebar(url: string) {
+    const noSidebarPages = ['/', '/login', '/register', '/forgot-password',
+                            '/reset-password', '/conferences', '/appels',
+                            '/institutions', '/contact'];
+    this.showSidebar = this.userState.isLoggedIn() &&
+                       !noSidebarPages.includes(url) &&
+                       !url.startsWith('/conferences/');
   }
 
   logout() {
-    this.auth.logout();
-    this.isLoggedIn = false;
-    this.user = null;
+    this.userState.logout();
+    this.router.navigate(['/']);
   }
 }
