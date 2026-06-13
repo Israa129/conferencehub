@@ -1,1 +1,25 @@
 <p>my-registrations works!</p>
+<div class="page-header">
+  <h2>Mes inscriptions</h2>
+  <p>Retrouvez toutes vos conférences enregistrées.</p>
+</div>
+
+<div class="registration-card"
+     *ngFor="let registration of registrations">
+
+  <h3>{{ registration.title }}</h3>
+
+  <p>
+    📍 {{ registration.location }}
+  </p>
+
+  <span
+    class="badge"
+    [class.confirmed]="registration.status === 'Confirmée'"
+    [class.pending]="registration.status === 'En attente'">
+
+    {{ registration.status }}
+
+  </span>
+
+</div>

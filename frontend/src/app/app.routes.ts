@@ -11,14 +11,12 @@ import { ConferenceList } from './features/conferences/conference-list/conferenc
 import { Dashboard } from './features/participant/dashboard/dashboard';
 import { QrCode } from './features/participant/qr-code/qr-code';
 import { Certificates } from './features/participant/certificates/certificates';
-import { Profile } from './features/participant/profile/profile';
 import { Settings } from './features/participant/settings/settings';
-import { ParticipantLayout } from './features/participant/participant-layout/participant-layout';
+
 import { OrganisateurDashboard } from './features/organisateur/organisateur-dashboard/organisateur-dashboard';
 import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
-
 
 export const routes: Routes = [
 
@@ -30,26 +28,44 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
 
   {
-    path: 'participant',
-    component: ParticipantLayout,
-    children: [
-      { path: 'dashboard', component: Dashboard },
-      {
-        path: 'my-registrations',
-        loadComponent: () =>
-          import('./features/participant/my-registrations/my-registrations')
-            .then(m => m.MyRegistrations)
-      },
-      { path: 'qr-code', component: QrCode },
-      { path: 'certificates', component: Certificates },
-      { path: 'profile', component: Profile },
-      { path: 'settings', component: Settings }
-    ]
+    path: 'participant/dashboard',
+    component: Dashboard
   },
+
+  {
+    path: 'participant/my-registrations',
+    loadComponent: () =>
+      import('./features/participant/my-registrations/my-registrations')
+        .then(m => m.MyRegistrations)
+  },
+
+  {
+    path: 'participant/qr-code',
+    component: QrCode
+  },
+
+  {
+    path: 'participant/certificates',
+    component: Certificates
+  },
+
+
+  {
+    path: 'participant/settings',
+    component: Settings
+  },
+
+  {
+  path: 'participant/conferences',
+  component: ConferenceList
+},
 
   { path: 'conferences/new', component: ConferenceFormulaire },
   { path: 'conferences/:id', component: ConferenceDetails },
   { path: 'conferences/:id/edit', component: ConferenceFormulaire },
+
   { path: 'organisateur', component: OrganisateurDashboard },
+
   { path: 'admin/dashboard', component: AdminDashboardComponent },
+
 ];
