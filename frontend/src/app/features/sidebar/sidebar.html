@@ -1,24 +1,24 @@
-<aside class="sidebar" *ngIf="isLoggedIn">
+<aside class="sidebar" *ngIf="showSidebar">
 
-  <!-- Profil utilisateur -->
+  <!-- Profil -->
   <div class="sidebar-profile">
-    <div class="avatar">
-      {{ user?.prenom?.charAt(0) }}{{ user?.nom?.charAt(0) }}
+    <div class="avatar" [class.avatar-admin]="userState.user()?.role === 'admin'">
+      {{ userState.user()?.prenom?.charAt(0) }}{{ userState.user()?.nom?.charAt(0) }}
     </div>
     <div class="user-info">
-      <span class="user-name">{{ user?.prenom }} {{ user?.nom }}</span>
-      <span class="user-role">{{ user?.role | titlecase }}</span>
+      <span class="user-name">{{ userState.user()?.prenom }} {{ userState.user()?.nom }}</span>
+      <span class="user-role">{{ userState.user()?.role | titlecase }}</span>
     </div>
   </div>
 
   <nav class="sidebar-nav">
 
-    <!-- ── PARTICIPANT ── -->
-    <ng-container *ngIf="user?.role === 'participant'">
+    <!-- PARTICIPANT -->
+    <ng-container *ngIf="userState.user()?.role === 'participant'">
       <a class="nav-item" routerLink="/participant/dashboard" routerLinkActive="active">
         <span>🏠</span> Tableau de bord
       </a>
-      <a class="nav-item" routerLink="/participant/conferences" routerLinkActive="active">
+      <a class="nav-item" routerLink="/conferences" routerLinkActive="active">
         <span>🎓</span> Conférences
       </a>
       <a class="nav-item" routerLink="/participant/my-registrations" routerLinkActive="active">
@@ -32,8 +32,8 @@
       </a>
     </ng-container>
 
-    <!-- ── CONFÉRENCIER ── -->
-    <ng-container *ngIf="user?.role === 'conferencier'">
+    <!-- CONFÉRENCIER -->
+    <ng-container *ngIf="userState.user()?.role === 'conferencier'">
       <a class="nav-item" routerLink="/conferencier/dashboard" routerLinkActive="active">
         <span>🏠</span> Tableau de bord
       </a>
@@ -48,8 +48,8 @@
       </a>
     </ng-container>
 
-    <!-- ── ORGANISATEUR ── -->
-    <ng-container *ngIf="user?.role === 'organisateur'">
+    <!-- ORGANISATEUR -->
+    <ng-container *ngIf="userState.user()?.role === 'organisateur'">
       <a class="nav-item" routerLink="/organisateur/dashboard" routerLinkActive="active">
         <span>🏠</span> Tableau de bord
       </a>
@@ -67,8 +67,9 @@
       </a>
     </ng-container>
 
-    <!-- ── ADMIN ── -->
-    <ng-container *ngIf="user?.role === 'admin'">
+    <!-- ADMIN -->
+    <ng-container *ngIf="userState.user()?.role === 'admin'">
+      <span class="nav-section">SYSTÈME</span>
       <a class="nav-item" routerLink="/admin/dashboard" routerLinkActive="active">
         <span>🏠</span> Vue d'ensemble
       </a>
@@ -81,9 +82,22 @@
       <a class="nav-item" routerLink="/admin/roles" routerLinkActive="active">
         <span>🔑</span> Rôles & Permissions
       </a>
+      <a class="nav-item" routerLink="/admin/analytics" routerLinkActive="active">
+        <span>📊</span> Analytics
+      </a>
+      <a class="nav-item" routerLink="/admin/logs" routerLinkActive="active">
+        <span>📋</span> Journaux d'audit
+      </a>
+      <span class="nav-section">CONFIGURATION</span>
+      <a class="nav-item" routerLink="/admin/parametres" routerLinkActive="active">
+        <span>⚙️</span> Paramètres
+      </a>
+      <a class="nav-item" routerLink="/admin/mailing" routerLinkActive="active">
+        <span>✉️</span> Mailing
+      </a>
     </ng-container>
 
-    <!-- ── COMMUN ── -->
+    <!-- COMMUN -->
     <div class="sidebar-divider"></div>
     <a class="nav-item" routerLink="/profile" routerLinkActive="active">
       <span>👤</span> Mon profil

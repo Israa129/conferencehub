@@ -12,7 +12,7 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/register`, data);
   }
 
-  login(data: { email: string; password: string; remember?: boolean }) {
+  login(data: any) {
     return this.http.post(`${this.baseUrl}/login`, data);
   }
 

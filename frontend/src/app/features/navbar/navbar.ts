@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
-import { AuthService } from '../../core/services/auth';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { UserStateService } from '../../core/services/user-state';
 
 @Component({
   selector: 'app-navbar',
@@ -11,29 +11,30 @@ import { AuthService } from '../../core/services/auth';
   styleUrl: './navbar.scss',
 })
 export class Navbar implements OnInit {
-  isLoggedIn = false;
-  user: any = null;
   isAuthPage = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    public userState: UserStateService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.isLoggedIn = this.auth.isLoggedIn();
-    this.user = this.auth.getUser();
-
+    this.checkPage(this.router.url);
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        const authPages = ['/login', '/register', '/forgot-password', '/reset-password'];
-        this.isAuthPage = authPages.some(p => event.url.startsWith(p));
-        this.isLoggedIn = this.auth.isLoggedIn();
-        this.user = this.auth.getUser();
+        this.checkPage(event.url);
+        this.userState.refresh();
       }
     });
   }
 
+  checkPage(url: string) {
+    const authPages = ['/login', '/register', '/forgot-password', '/reset-password'];
+    this.isAuthPage = authPages.some(p => url.startsWith(p));
+  }
+
   logout() {
-    this.auth.logout();
-    this.isLoggedIn = false;
-    this.user = null;
+    this.userState.logout();
+    this.router.navigate(['/']);
   }
 }

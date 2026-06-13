@@ -56,6 +56,7 @@
       </header>
 
       <div *ngIf="erreur" class="alert">{{ erreur }}</div>
+      <div *ngIf="succes" class="succes">{{ succes }}</div>
 
       <div class="oauth-grid">
         <button type="button" class="oauth-btn">
@@ -79,7 +80,7 @@
           [(ngModel)]="form.email"
           name="email"
           type="email"
-          placeholder="jean.dupont@utbm.fr"
+          placeholder="panawe.dayoka@utbm.fr"
           required
           email
         />
