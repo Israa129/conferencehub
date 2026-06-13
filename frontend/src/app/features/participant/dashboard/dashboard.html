@@ -29,14 +29,17 @@
 
   <div class="card">
     <h3>Mes inscriptions</h3>
-    <div class="registration">
-      <strong>ICIA 2025</strong>
-      <span class="badge confirmed">Confirmée</span>
-    </div>
-    <div class="registration">
-      <strong>DataScience World Forum</strong>
-      <span class="badge pending">En attente</span>
-    </div>
+   <div
+  class="registration"
+  *ngFor="let conf of conferences">
+
+  <strong>{{ conf.title }}</strong>
+
+  <span class="badge confirmed">
+    Disponible
+  </span>
+
+</div>
     <button routerLink="/participant/my-registrations">Voir tout</button>
   </div>
 </div>
