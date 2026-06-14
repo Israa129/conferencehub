@@ -6,4 +6,12 @@ import { Component } from '@angular/core';
   templateUrl: './qr-code.html',
   styleUrl: './qr-code.scss',
 })
-export class QrCode {}
+export class QrCode {
+
+  qrData = {
+    conference: 'ICIA 2025',
+    participant: 'Amara',
+    status: 'Actif'
+  };
+
+}
