@@ -3,9 +3,10 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConferenceController;
-use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SessionConferenceController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +26,7 @@ Route::post('/reset-password',  [PasswordResetController::class, 'resetPassword'
 
 // ── Publiques ───────────────────────────────────
 Route::apiResource('conferences', ConferenceController::class);
-Route::apiResource('sessions',    SessionController::class);
+Route::apiResource('sessions',    SessionConferenceController::class);
 
 // ── Auth protégées ──────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
@@ -49,11 +50,17 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+        Route::get('/dashboard',                [AdminController::class, 'dashboard']);
         Route::get('/stats',                    [AdminController::class, 'stats']);
         Route::get('/utilisateurs',             [AdminController::class, 'utilisateurs']);
         Route::put('/utilisateurs/{id}/role',   [AdminController::class, 'updateRole']);
         Route::put('/utilisateurs/{id}/statut', [AdminController::class, 'toggleStatut']);
         Route::delete('/utilisateurs/{id}',     [AdminController::class, 'deleteUser']);
     });
+    Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile',          [ProfileController::class, 'show']);
+    Route::put('/profile',          [ProfileController::class, 'update']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+});
 
 });

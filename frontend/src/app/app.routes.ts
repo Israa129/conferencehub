@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
 import { HomeComponent } from './features/home/home/home';
 
 import { ConferenceFormulaire } from './features/conferences/conference-formulaire/conference-formulaire';
@@ -11,45 +13,65 @@ import { ConferenceList } from './features/conferences/conference-list/conferenc
 import { Dashboard } from './features/participant/dashboard/dashboard';
 import { QrCode } from './features/participant/qr-code/qr-code';
 import { Certificates } from './features/participant/certificates/certificates';
-import { Profile } from './features/participant/profile/profile';
 import { Settings } from './features/participant/settings/settings';
 import { ParticipantLayout } from './features/participant/participant-layout/participant-layout';
 import { OrganisateurDashboard } from './features/organisateur/organisateur-dashboard/organisateur-dashboard';
-import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
-import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
+import { ProfilePageComponent } from './features/profile/profile-page/profile-page';
 
 
 export const routes: Routes = [
 
+  // ── Accueil ──────────────────────────────────
   { path: '', component: HomeComponent, pathMatch: 'full' },
 
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  // ── Auth ─────────────────────────────────────
+  { path: 'login',           component: LoginComponent },
+  { path: 'register',        component: RegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'reset-password',  component: ResetPasswordComponent },
 
+  // ── Profil commun (tous rôles) ───────────────
+  { path: 'profile', component: ProfilePageComponent },
+
+  // ── Participant ──────────────────────────────
   {
     path: 'participant',
     component: ParticipantLayout,
     children: [
-      { path: 'dashboard', component: Dashboard },
+      { path: '',                 redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard',        component: Dashboard },
+      { path: 'qr-code',          component: QrCode },
+      { path: 'certificates',     component: Certificates },
+      { path: 'settings',         component: Settings },
       {
         path: 'my-registrations',
         loadComponent: () =>
           import('./features/participant/my-registrations/my-registrations')
             .then(m => m.MyRegistrations)
       },
-      { path: 'qr-code', component: QrCode },
-      { path: 'certificates', component: Certificates },
-      { path: 'profile', component: Profile },
-      { path: 'settings', component: Settings }
     ]
   },
 
-  { path: 'conferences/new', component: ConferenceFormulaire },
-  { path: 'conferences/:id', component: ConferenceDetails },
-  { path: 'conferences/:id/edit', component: ConferenceFormulaire },
+  // ── Organisateur ─────────────────────────────
   { path: 'organisateur', component: OrganisateurDashboard },
-  { path: 'admin/dashboard', component: AdminDashboardComponent },
+
+  // ── Admin ────────────────────────────────────
+  { path: 'admin/dashboard',    component: AdminDashboardComponent },
+  { path: 'admin/utilisateurs', component: AdminDashboardComponent },
+  { path: 'admin/conferences',  component: AdminDashboardComponent },
+  { path: 'admin/roles',        component: AdminDashboardComponent },
+  { path: 'admin/analytics',    component: AdminDashboardComponent },
+  { path: 'admin/logs',         component: AdminDashboardComponent },
+  { path: 'admin/parametres',   component: AdminDashboardComponent },
+  { path: 'admin/mailing',      component: AdminDashboardComponent },
+
+  // ── Conférences ──────────────────────────────
+  { path: 'conferences',          component: ConferenceList },
+  { path: 'conferences/new',      component: ConferenceFormulaire },
+  { path: 'conferences/:id',      component: ConferenceDetails },
+  { path: 'conferences/:id/edit', component: ConferenceFormulaire },
+
+  // ── Fallback ─────────────────────────────────
+  { path: '**', redirectTo: '' },
 ];
