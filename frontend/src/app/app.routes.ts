@@ -5,7 +5,7 @@ import { HomeComponent } from './features/home/home/home';
 import { ConferenceFormulaire } from './features/conferences/conference-formulaire/conference-formulaire';
 import { ConferenceDetails } from './features/conferences/conference-details/conference-details';
 import { ConferenceList } from './features/conferences/conference-list/conference-list';
-import { ConferencierDashboard } from './features/conferencier/conferencier-dashboard/conferencier-dashboard';
+import { ConferencierDashboardComponent } from './features/conferencier/conferencier-dashboard/conferencier-dashboard';
 import { ConferencierLayout } from './features/conferencier/conferencier-layout/conferencier-layout';
 import { Dashboard } from './features/participant/dashboard/dashboard';
 import { QrCode } from './features/participant/qr-code/qr-code';
@@ -46,7 +46,7 @@ export const routes: Routes = [
     path: 'conferencier',
     component: ConferencierLayout,
     children: [
-      { path: 'dashboard', component: ConferencierDashboard },
+      { path: 'conferencier/dashboard', component: ConferencierDashboardComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
