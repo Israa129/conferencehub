@@ -3,8 +3,8 @@ export class SessionConference {
     public id: number,
     public titre: string,
     public type: string,
-    public horaireDebut: Date,
-    public horaireFin: Date,
+    public horaireDebut: Date | string,
+    public horaireFin: Date | string,
     public capacite: number,
     public conferenceId: number
   ) {}

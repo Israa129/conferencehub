@@ -1,85 +1,86 @@
 @if (!loading && conference) {
 
-  <div class="card" style="margin-bottom:1.5rem;">
-    <div class="card-accent-bar"></div>
+<div class="card" style="margin-bottom:1.5rem;">
+  <div class="card-accent-bar"></div>
 
-    <div class="card-body">
+  <div class="card-body">
 
-      <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:1rem;">
-        <span class="badge badge-blue">
-          {{ conference.theme }}
-        </span>
-      </div>
-
-      <h1 style="font-size:1.75rem; margin-bottom:8px;">
-        {{ conference.titre }}
-      </h1>
-
-      <p style="font-size:14px; color:var(--text-muted); margin-bottom:1.5rem;">
-        {{ conference.description }}
-      </p>
-
-      <div class="info-grid">
-        <div class="info-cell">
-          <div class="label">📍 Lieu</div>
-          <div class="value">{{ conference.lieu }}</div>
-        </div>
-
-        <div class="info-cell">
-          <div class="label">📅 Début</div>
-          <div class="value">
-            {{ conference.date_debut | date:'dd MMM yyyy' }}
-          </div>
-        </div>
-
-        <div class="info-cell">
-          <div class="label">📅 Fin</div>
-          <div class="value">
-            {{ conference.date_fin | date:'dd MMM yyyy' }}
-          </div>
-        </div>
-
-        <div class="info-cell">
-          <div class="label">👤 Organisateur</div>
-          <!-- <div class="value">
-            {{ conference.organisateur?.nom || 'N/A' }}
-          </div> -->
-        </div>
-      </div>
-
+    <div
+      style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:1rem;">
+      <span class="badge badge-blue">
+        {{ conference.theme }}
+      </span>
     </div>
+
+    <h1 style="font-size:1.75rem; margin-bottom:8px;">
+      {{ conference.titre }}
+    </h1>
+
+    <p style="font-size:14px; color:var(--text-muted); margin-bottom:1.5rem;">
+      {{ conference.description }}
+    </p>
+
+    <div class="info-grid">
+      <div class="info-cell">
+        <div class="label">📍 Lieu</div>
+        <div class="value">{{ conference.lieu }}</div>
+      </div>
+
+      <div class="info-cell">
+        <div class="label">📅 Début</div>
+        <div class="value">
+          {{ conference.date_debut | date:'dd MMM yyyy' }}
+        </div>
+      </div>
+
+      <div class="info-cell">
+        <div class="label">📅 Fin</div>
+        <div class="value">
+          {{ conference.date_fin | date:'dd MMM yyyy' }}
+        </div>
+      </div>
+
+      <div class="info-cell">
+        <div class="label">👤 Organisateur</div>
+        <div class="value">
+          {{ conference.organisateur_id }}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="card">
+
+  <div class="section-header">
+    <div>
+      <h2>Sessions</h2>
+      <p>Programme de la conférence</p>
+    </div>
+
+    <a
+      routerLink="/sessions/new"
+      [queryParams]="{ conferenceId: conference.id }"
+      class="btn btn-outline"
+      style="font-size:12px;">
+      + Ajouter une session
+    </a>
   </div>
 
-  <div class="card">
+  <div style="padding:1.25rem 1.5rem;">
 
-    <div class="section-header">
-      <div>
-        <h2>Sessions</h2>
-        <p>Programme de la conférence</p>
+    @if (loadingSessions) {
+      <p>Chargement des sessions...</p>
+    }
+
+    @if (!loadingSessions && sessions.length === 0) {
+      <div class="empty-state" style="padding:2rem 0;">
+        <p>Aucune session programmée pour cette conférence.</p>
       </div>
+    }
 
-      <a
-        routerLink="/sessions/new"
-        [queryParams]="{ conferenceId: conference.id }"
-        class="btn btn-outline"
-        style="font-size:12px;"
-      >
-        + Ajouter une session
-      </a>
-    </div>
-
-    <div style="padding:1.25rem 1.5rem;">
-
-      @if (loadingSessions) {
-        <p>Chargement des sessions...</p>
-      }
-
-      @if (!loadingSessions && sessions.length === 0) {
-        <div class="empty-state" style="padding:2rem 0;">
-          <p>Aucune session programmée pour cette conférence.</p>
-        </div>
-      }
-
+    @if (!loadingSessions && sessions.length > 0) {
       <div class="sessions-list">
 
         @for (session of sessions; track session.id) {
@@ -87,7 +88,8 @@
           <div class="session-row">
 
             <div style="flex:1;">
-              <div style="display:flex; gap:8px; align-items:center; margin-bottom:4px;">
+              <div
+                style="display:flex; gap:8px; align-items:center; margin-bottom:4px;">
                 <span style="font-weight:600;">
                   {{ session.titre }}
                 </span>
@@ -98,13 +100,20 @@
               </div>
 
               <div style="display:flex; gap:16px; flex-wrap:wrap;">
-                <span style="font-size:12px; color:var(--text-muted);">
-                  🕐 {{ session.horaireDebut }} → {{ session.horaireFin }}
+
+                <span
+                  style="font-size:12px; color:var(--text-muted);">
+                  🕐
+                  {{ session.horaireDebut | date:'dd/MM/yyyy HH:mm' }}
+                  →
+                  {{ session.horaireFin | date:'dd/MM/yyyy HH:mm' }}
                 </span>
 
-                <span style="font-size:12px; color:var(--text-muted);">
+                <span
+                  style="font-size:12px; color:var(--text-muted);">
                   👥 {{ session.capacite }} places
                 </span>
+
               </div>
             </div>
 
@@ -112,24 +121,21 @@
               <a
                 [routerLink]="['/sessions', session.id]"
                 class="btn btn-ghost"
-                style="font-size:12px;"
-              >
+                style="font-size:12px;">
                 Voir
               </a>
 
               <a
                 [routerLink]="['/sessions', session.id, 'edit']"
                 class="btn btn-outline"
-                style="font-size:12px; padding:5px 12px;"
-              >
+                style="font-size:12px; padding:5px 12px;">
                 Modifier
               </a>
 
               <button
                 class="btn btn-danger"
                 style="font-size:12px; padding:5px 12px;"
-                (click)="deleteSession(session)"
-              >
+                (click)="deleteSession(session)">
                 Suppr.
               </button>
             </div>
@@ -139,7 +145,9 @@
         }
 
       </div>
-    </div>
+    }
+
   </div>
+</div>
 
 }
