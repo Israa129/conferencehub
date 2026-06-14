@@ -1,13 +1,14 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConferenceController;
-use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SessionConferenceController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,14 +21,27 @@ Route::get('/test', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 Route::apiResource('conferences', ConferenceController::class);
-Route::apiResource('sessions', SessionController::class);
+Route::apiResource('sessions',    SessionConferenceController::class);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me',      [AuthController::class, 'me']);
+
+    Route::prefix('admin')->group(function () {
+        Route::get('/dashboard',                [AdminController::class, 'dashboard']);
+        Route::get('/stats',                    [AdminController::class, 'stats']);
+        Route::get('/utilisateurs',             [AdminController::class, 'utilisateurs']);
+        Route::put('/utilisateurs/{id}/role',   [AdminController::class, 'updateRole']);
+        Route::put('/utilisateurs/{id}/statut', [AdminController::class, 'toggleStatut']);
+        Route::delete('/utilisateurs/{id}',     [AdminController::class, 'deleteUser']);
+    });
+
+    Route::get('/profile',          [ProfileController::class, 'show']);
+    Route::put('/profile',          [ProfileController::class, 'update']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
 });
 
-// Routes conférencier
+// Routes conférencier (pas encore protégées par auth:sanctum)
 Route::prefix('conferencier')->group(function () {
     Route::get('/stats',                  [ArticleController::class, 'stats']);
     Route::get('/articles',               [ArticleController::class, 'index']);

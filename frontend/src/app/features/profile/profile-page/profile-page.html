@@ -1,0 +1,125 @@
+<div class="profile-page" *ngIf="!chargement">
+
+  <!-- En-tête profil -->
+  <div class="profile-header">
+    <div class="profile-avatar">
+      {{ getInitiales() }}
+    </div>
+    <div class="profile-info">
+      <h1>{{ form.prenom }} {{ form.nom }}</h1>
+      <p>{{ form.email }}</p>
+      <span class="role-badge"
+        [style.color]="getRoleBadge().color"
+        [style.background]="getRoleBadge().bg">
+        {{ getRoleBadge().label }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <div class="profile-tabs">
+    <button class="tab" [class.active]="onglet === 'profil'"
+      (click)="onglet = 'profil'">
+      👤 Informations personnelles
+    </button>
+    <button class="tab" [class.active]="onglet === 'securite'"
+      (click)="onglet = 'securite'">
+      🔒 Sécurité
+    </button>
+  </div>
+
+  <!-- ── Onglet Profil ── -->
+  <div class="profile-card" *ngIf="onglet === 'profil'">
+    <h2>Informations personnelles</h2>
+    <p class="card-desc">Modifiez vos informations personnelles</p>
+
+    <div *ngIf="messageSucces" class="alert succes">✅ {{ messageSucces }}</div>
+    <div *ngIf="messageErreur" class="alert erreur">❌ {{ messageErreur }}</div>
+
+    <form (ngSubmit)="saveProfile()">
+      <div class="form-row">
+        <div class="field">
+          <label>Nom *</label>
+          <input [(ngModel)]="form.nom" name="nom"
+            placeholder="Votre nom" required />
+        </div>
+        <div class="field">
+          <label>Prénom *</label>
+          <input [(ngModel)]="form.prenom" name="prenom"
+            placeholder="Votre prénom" required />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Adresse email *</label>
+        <input [(ngModel)]="form.email" name="email"
+          type="email" placeholder="votre@email.com" required />
+      </div>
+
+      <div class="field">
+        <label>Pays</label>
+        <input [(ngModel)]="form.pays" name="pays"
+          placeholder="Votre pays" />
+      </div>
+
+      <div class="field">
+        <label>Rôle</label>
+        <input [value]="getRoleBadge().label" disabled class="input-disabled" />
+        <small>Le rôle ne peut être modifié que par un administrateur.</small>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="loadProfile()" class="btn-secondary">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="sauvegarde">
+          {{ sauvegarde ? 'Sauvegarde...' : '💾 Sauvegarder' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Onglet Sécurité ── -->
+  <div class="profile-card" *ngIf="onglet === 'securite'">
+    <h2>Changer le mot de passe</h2>
+    <p class="card-desc">Choisissez un mot de passe sécurisé</p>
+
+    <div *ngIf="messageSuccesMdp" class="alert succes">✅ {{ messageSuccesMdp }}</div>
+    <div *ngIf="messageErreurMdp" class="alert erreur">❌ {{ messageErreurMdp }}</div>
+
+    <form (ngSubmit)="savePassword()">
+      <div class="field">
+        <label>Mot de passe actuel *</label>
+        <input [(ngModel)]="passwordForm.current_password"
+          name="current_password" type="password"
+          placeholder="••••••••" required />
+      </div>
+
+      <div class="field">
+        <label>Nouveau mot de passe *</label>
+        <input [(ngModel)]="passwordForm.password"
+          name="password" type="password"
+          placeholder="Minimum 6 caractères" required />
+      </div>
+
+      <div class="field">
+        <label>Confirmer le mot de passe *</label>
+        <input [(ngModel)]="passwordForm.password_confirmation"
+          name="password_confirmation" type="password"
+          placeholder="Répétez le mot de passe" required />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="sauvegarde">
+          {{ sauvegarde ? 'Modification...' : '🔒 Modifier le mot de passe' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<!-- Chargement -->
+<div class="loading" *ngIf="chargement">
+  ⏳ Chargement du profil...
+</div>

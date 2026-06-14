@@ -12,12 +12,14 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve"
+  
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
+
   },
   "files": [],
   "references": [
