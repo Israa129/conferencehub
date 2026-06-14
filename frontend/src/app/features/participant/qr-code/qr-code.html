@@ -1,1 +1,35 @@
-<h1>Mon QR Code</h1>
+<div class="page-header">
+  <h2>Mon QR Code</h2>
+  <p>Présentez ce QR Code lors de votre arrivée à la conférence.</p>
+</div>
+
+<div class="qr-card">
+
+  <div class="qr-placeholder">
+    QR CODE
+  </div>
+
+  <div class="info">
+    <p>
+      <strong>Participant :</strong>
+      {{ qrData.participant }}
+    </p>
+
+    <p>
+      <strong>Conférence :</strong>
+      {{ qrData.conference }}
+    </p>
+
+    <p>
+      <strong>Statut :</strong>
+      <span class="badge">
+        {{ qrData.status }}
+      </span>
+    </p>
+  </div>
+
+  <button>
+    Télécharger le QR
+  </button>
+
+</div>
