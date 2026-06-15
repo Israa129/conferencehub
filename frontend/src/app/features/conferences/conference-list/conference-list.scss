@@ -121,6 +121,10 @@
   color: #111827;
   display: block;
   margin-bottom: 2px;
+
+  &:hover {
+    color: #1a56db;
+  }
 }
 
 .conference-desc-truncate {
