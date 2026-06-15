@@ -18,11 +18,10 @@ export class App {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
     const noLayout = ['/login', '/register', '/forgot-password', '/reset-password'];
-    const noNavbar = ['/conferencier'];
     const currentUrl = event.url;
 
     this.showLayout = !noLayout.includes(currentUrl) && currentUrl !== '/';
-    this.showNavbar = !noNavbar.some(path => currentUrl.startsWith(path));
+    this.showNavbar = this.showLayout;
           }
     });
   }

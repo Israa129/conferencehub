@@ -57,7 +57,10 @@ export const routes: Routes = [
     path: 'conferencier',
     component: ConferencierLayout,
     children: [
-      { path: 'dashboard', component: ConferencierDashboard },
+      { path: 'dashboard',  component: ConferencierDashboard, data: { mode: 'dashboard' } },
+      { path: 'articles',   component: ConferencierDashboard, data: { mode: 'articles' } },
+      { path: 'archives',   component: ConferencierDashboard, data: { mode: 'archives' } },
+      { path: 'soumettre',  component: ConferencierDashboard, data: { mode: 'soumettre' } },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
