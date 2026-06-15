@@ -65,7 +65,6 @@ export class ConferenceList implements OnInit {
 
     this.conferenceService.delete(id).subscribe({
       next: () => {
-        // Retire du signal sans refaire un appel réseau
         this.conferences.update(list => list.filter(c => c.id !== id));
       },
       error: (err) => console.error('Erreur suppression', err)

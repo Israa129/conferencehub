@@ -13,13 +13,11 @@
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
       <div class="form-group">
-        <label>Titre *</label>
+        <label>Titre de la conférence *</label>
         <input type="text" formControlName="titre" placeholder="Ex : DevFest 2025" />
 
         @if (f['titre'].touched && f['titre'].errors?.['required']) {
-          <small style="color:var(--danger);font-size:12px;">
-            Le titre est requis.
-          </small>
+          <small class="error-text">Le titre est requis.</small>
         }
       </div>
 
@@ -57,9 +55,71 @@
         <input type="number" formControlName="organisateur_id" placeholder="ID de l'utilisateur organisateur" />
       </div>
 
+      <hr class="form-separator" />
+
+      <div class="sessions-header-box">
+        <h3>Programme & Sessions</h3>
+        <button type="button" class="btn btn-outline btn-sm" (click)="addSession()">
+          <span class="material-icons">add</span> Ajouter une session
+        </button>
+      </div>
+
+      <div formArrayName="sessions" class="sessions-list">
+        @for (sessionCtrl of sessions.controls; track $index) {
+          <div [formGroupName]="$index" class="session-nested-card">
+            
+            <div class="session-card-header">
+              <h4>Session n°{{ $index + 1 }}</h4>
+              <button type="button" class="btn-remove-session" (click)="removeSession($index)">
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
+
+            <div class="form-group">
+              <label>Titre de la session *</label>
+              <input type="text" formControlName="titre" placeholder="Ex : Introduction au Deep Learning" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Type *</label>
+                <select formControlName="type">
+                  <option value="">Sélectionner un type</option>
+                  <option value="Keynote">Keynote</option>
+                  <option value="Workshop">Workshop</option>
+                  <option value="Panel">Table ronde</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Capacité max *</label>
+                <input type="number" formControlName="capacite" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Horaire de début *</label>
+                <input type="date" formControlName="horaireDebut" />
+              </div>
+
+              <div class="form-group">
+                <label>Horaire de fin *</label>
+                <input type="date" formControlName="horaireFin" />
+              </div>
+            </div>
+
+          </div>
+        }
+
+        @if (sessions.length === 0) {
+          <p class="no-session-hint">Aucune session programmée pour l'instant. Vous pourrez en ajouter plus tard.</p>
+        }
+      </div>
+
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">
-          {{ isEdit ? 'Enregistrer les modifications' : 'Créer la conférence' }}
+          {{ isEdit ? 'Enregistrer les modifications' : 'Créer la conférence et ses sessions' }}
         </button>
       </div>
 
