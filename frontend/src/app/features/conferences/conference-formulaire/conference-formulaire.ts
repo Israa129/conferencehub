@@ -136,7 +136,6 @@ export class ConferenceFormulaire implements OnInit {
             conference_id: conferenceId
           };
 
-          // 🔥 FIX TS ICI (important)
           return this.sessionService.create(payload as any);
         });
 

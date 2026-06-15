@@ -29,7 +29,6 @@ export class RegisterComponent {
     this.erreur = '';
     this.auth.register(this.form).subscribe({
       next: () => {
-        // ✅ Inscription réussie → page Login avec message
         this.router.navigate(['/login'], {
           queryParams: { registered: 'success' }
         });
