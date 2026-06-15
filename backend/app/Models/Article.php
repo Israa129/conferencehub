@@ -2,43 +2,38 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Article extends Model
 {
+    protected $connection = 'mongodb';
+    protected $collection = 'articles';
+
     protected $fillable = [
         'titre',
         'resume',
         'mots_cles',
         'fichier_pdf',
-        'statut',           // 'en_revision' | 'accepte' | 'refuse'
+        'statut',
         'commentaires',
-        'user_id',
-        'session_id',
+        'conference_id',
+        'conference_nom',
+        'conference_lieu',
+        'conferencier_id',
+        'conferencier_nom',
+        'session_assignee',
         'date_presentation',
     ];
 
     protected $casts = [
-        'mots_cles'  => 'array',
+        'mots_cles' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
-    // ── Relations ──────────────────────────────────────────────
-    public function auteur()
+    public function scopeByConferencier($query, $id)
     {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function sessionConference()
-    {
-        return $this->belongsTo(SessionConference::class, 'session_id');
-    }
-
-    // ── Scopes ─────────────────────────────────────────────────
-    public function scopeByConferencier($query, $conferencierId)
-    {
-        return $query->where('user_id', $conferencierId);
+        return $query->where('conferencier_id', $id);
     }
 
     public function scopeByStatut($query, $statut)

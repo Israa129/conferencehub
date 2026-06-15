@@ -6,7 +6,7 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class ActivityLog extends Model
 {
-    protected $connection = 'mongodb';
+    protected $connection = 'mongodb_logs';
     protected $collection = 'activity_logs';
 
     protected $fillable = [

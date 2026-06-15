@@ -67,6 +67,11 @@ return [
             'dsn'      => env('MONGODB_URI', 'mongodb://127.0.0.1:27017'),
             'database' => env('MONGODB_DATABASE', 'conferencehub_logs'),
         ],
+        'mongodb_logs' => [
+            'driver'   => 'mongodb',
+            'dsn'      => env('MONGODB_LOGS_URI', 'mongodb://localhost:27017'),
+            'database' => env('MONGODB_LOGS_DATABASE', 'conferencehub_logs'),
+        ],
 
         'sqlsrv' => [
             'driver'         => 'sqlsrv',
