@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SessionConference;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log; 
 
 class SessionConferenceController extends Controller
 {
@@ -51,7 +52,15 @@ class SessionConferenceController extends Controller
             'conference_id' => 'required|exists:conferences,id',
         ])->validate();
 
-        return response()->json(SessionConference::create($data), 201);
+        $session = SessionConference::create($data);
+
+        Log::info('Session de conférence ajoutée', [
+            'id' => $session->id,
+            'titre' => $session->titre,
+            'conference_id' => $session->conference_id
+        ]);
+
+        return response()->json($session, 201);
     }
 
     public function show(SessionConference $sessionConference)
@@ -73,33 +82,49 @@ class SessionConferenceController extends Controller
         ])->validate();
 
         $sessionConference->update($data);
+
+        Log::info('Session de conférence modifiée', [
+            'id' => $sessionConference->id,
+            'titre' => $sessionConference->titre
+        ]);
+
         return response()->json($sessionConference);
     }
 
     public function destroy(SessionConference $sessionConference)
     {
+        $oldId = $sessionConference->id;
+        $oldTitre = $sessionConference->titre;
+
         $sessionConference->delete();
+
+        Log::warning('Session de conférence supprimée', [
+            'id' => $oldId,
+            'titre' => $oldTitre
+        ]);
+
         return response()->noContent();
     }
+
     protected function serializeDate(\DateTimeInterface $date): string
-{
-    return $date->format('Y-m-d\TH:i:s.u\Z');
-}
+    {
+        return $date->format('Y-m-d\TH:i:s.u\Z');
+    }
 
-public function toArray()
-{
-    $array = parent::toArray();
+    public function toArray()
+    {
+        $array = parent::toArray();
 
-    return [
-        'id'           => $array['id'],
-        'titre'        => $array['titre'],
-        'type'         => $array['type'],
-        'horaireDebut' => $array['horaire_debut'],
-        'horaireFin'   => $array['horaire_fin'],
-        'capacite'     => $array['capacite'],
-        'conferenceId' => $array['conference_id'],
-        'createdAt'    => $array['created_at'] ?? null,
-        'updatedAt'    => $array['updated_at'] ?? null,
-    ];
-}
+        return [
+            'id'           => $array['id'],
+            'titre'        => $array['titre'],
+            'type'         => $array['type'],
+            'horaireDebut' => $array['horaire_debut'],
+            'horaireFin'   => $array['horaire_fin'],
+            'capacite'     => $array['capacite'],
+            'conferenceId' => $array['conference_id'],
+            'createdAt'    => $array['created_at'] ?? null,
+            'updatedAt'    => $array['updated_at'] ?? null,
+        ];
+    }
 }

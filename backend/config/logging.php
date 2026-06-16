@@ -126,6 +126,11 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'mongodb' => [
+            'driver' => 'custom',
+            'via'    => App\Logging\MongoLogger::class,
+            'level'  => 'debug',
+        ],
 
     ],
 
