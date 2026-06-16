@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../../core/services/profile';
 import { AuthService }    from '../../../core/services/auth';
+
 @Component({
   selector: 'app-profile-page',
   standalone: true,
@@ -12,10 +13,8 @@ import { AuthService }    from '../../../core/services/auth';
 })
 export class ProfilePageComponent implements OnInit {
 
-  // Onglet actif
   onglet: 'profil' | 'securite' = 'profil';
 
-  // Données profil
   form = {
     nom: '',
     prenom: '',
@@ -24,14 +23,12 @@ export class ProfilePageComponent implements OnInit {
     role: ''
   };
 
-  // Données mot de passe
   passwordForm = {
     current_password: '',
     password: '',
     password_confirmation: ''
   };
 
-  // États
   chargement = true;
   sauvegarde = false;
   messageSucces = '';
@@ -41,7 +38,8 @@ export class ProfilePageComponent implements OnInit {
 
   constructor(
     private profileService: ProfileService,
-    private auth: AuthService
+    private auth: AuthService,
+    private cdr: ChangeDetectorRef   // ✅ AJOUT
   ) {}
 
   ngOnInit() {
@@ -60,8 +58,12 @@ export class ProfilePageComponent implements OnInit {
           role:   user.role   || ''
         };
         this.chargement = false;
+        this.cdr.detectChanges();   // ✅ AJOUT
       },
-      error: () => this.chargement = false
+      error: () => {
+        this.chargement = false;
+        this.cdr.detectChanges();   // ✅ AJOUT
+      }
     });
   }
 
@@ -78,7 +80,6 @@ export class ProfilePageComponent implements OnInit {
     }).subscribe({
       next: (res) => {
         this.messageSucces = res.message;
-        // Mettre à jour localStorage
         const user = this.auth.getUser();
         this.auth.saveToken(this.auth.getToken()!, {
           ...user,
@@ -88,11 +89,16 @@ export class ProfilePageComponent implements OnInit {
           pays:   this.form.pays
         });
         this.sauvegarde = false;
-        setTimeout(() => this.messageSucces = '', 3000);
+        this.cdr.detectChanges();   // ✅ AJOUT
+        setTimeout(() => {
+          this.messageSucces = '';
+          this.cdr.detectChanges();   // ✅ AJOUT
+        }, 3000);
       },
       error: (err) => {
         this.messageErreur = err.error?.message || 'Erreur lors de la mise à jour.';
         this.sauvegarde = false;
+        this.cdr.detectChanges();   // ✅ AJOUT
       }
     });
   }
@@ -111,11 +117,16 @@ export class ProfilePageComponent implements OnInit {
           password_confirmation: ''
         };
         this.sauvegarde = false;
-        setTimeout(() => this.messageSuccesMdp = '', 3000);
+        this.cdr.detectChanges();   // ✅ AJOUT
+        setTimeout(() => {
+          this.messageSuccesMdp = '';
+          this.cdr.detectChanges();   // ✅ AJOUT
+        }, 3000);
       },
       error: (err) => {
         this.messageErreurMdp = err.error?.message || 'Erreur lors du changement.';
         this.sauvegarde = false;
+        this.cdr.detectChanges();   // ✅ AJOUT
       }
     });
   }
