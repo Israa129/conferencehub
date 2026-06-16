@@ -70,4 +70,11 @@ export class ArticleService {
   telechargerPdf(id: string): Observable<Blob> {
     return this.http.get(`${this.api}/articles/${id}/download`, { responseType: 'blob' });
   }
+
+  changerStatut(id: string, statut: 'en_revision' | 'accepte' | 'refuse', commentaires?: string): Observable<{ success: boolean; message: string; data: Article }> {
+    return this.http.post<{ success: boolean; message: string; data: Article }>(
+      `${this.api}/articles/${id}/statut`, 
+      { statut, commentaires }
+    );
+  }
 }

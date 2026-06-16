@@ -1,0 +1,49 @@
+@if (article) {
+  <div class="card-details">
+    <h3>{{ article.titre }}</h3>
+    <p><strong>Auteur :</strong> {{ article.conferencier_nom }}</p>
+    <p><strong>Conférence :</strong> {{ article.conference_nom }}</p>
+    
+    <div class="resume-box">
+      <h5>Résumé :</h5>
+      <p>{{ article.resume }}</p>
+    </div>
+
+    <button class="btn-download" (click)="telechargerFichier()">
+       Télécharger le PDF
+    </button>
+
+    <hr />
+
+    <div class="decision-box">
+      <h4>Décision de l'évaluation</h4>
+      
+      <label for="comments">Commentaires / Remarques :</label>
+      <textarea 
+        id="comments" 
+        [(ngModel)]="commentaireSaisi" 
+        placeholder="Ajouter des remarques pour l'auteur..."
+        rows="4">
+      </textarea>
+
+      <div class="actions-buttons">
+        <button 
+          class="btn-refuse" 
+          [disabled]="isSaving" 
+          (click)="traiterArticle('refuse')">
+          Refuser l'article
+        </button>
+        <button 
+          class="btn-accept" 
+          [disabled]="isSaving" 
+          (click)="traiterArticle('accepte')">
+         Accepter l'article
+        </button>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="no-selection">
+    <p>Veuillez sélectionner un article dans la liste pour l'évaluer.</p>
+  </div>
+}
