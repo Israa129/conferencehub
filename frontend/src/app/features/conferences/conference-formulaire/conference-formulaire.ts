@@ -127,6 +127,16 @@ export class ConferenceFormulaire implements OnInit {
       return;
     }
 
+    if (this.isEdit && this.conferenceId) {
+      this.conferenceService.update(this.conferenceId, conferencePayload).subscribe({
+        next: () => {
+          this.router.navigate(['/conferences', this.conferenceId]);
+        },
+        error: (err) => console.error('Erreur modification conference:', err)
+      });
+      return;
+    }
+
     this.conferenceService.create(conferencePayload).subscribe({
       next: (newConf) => {
         const conferenceId = newConf?.id;

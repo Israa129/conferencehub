@@ -53,72 +53,76 @@
           </div>
         </div>
 
-        <hr class="form-separator" />
+        @if (!isEdit) {
+          <hr class="form-separator" />
+        }
       }
 
-      <div class="sessions-header-box">
-        <h3>{{ isSessionOnly ? 'Session' : 'Programme & Sessions' }}</h3>
-        @if (!isSessionOnly) {
-          <button type="button" class="btn btn-outline btn-sm" (click)="addSession()">
-            <span class="material-icons">add</span> Ajouter une session
-          </button>
-        }
-      </div>
+      @if (!isEdit) {
+        <div class="sessions-header-box">
+          <h3>{{ isSessionOnly ? 'Session' : 'Programme & Sessions' }}</h3>
+          @if (!isSessionOnly) {
+            <button type="button" class="btn btn-outline btn-sm" (click)="addSession()">
+              <span class="material-icons">add</span> Ajouter une session
+            </button>
+          }
+        </div>
 
-      <div formArrayName="sessions" class="sessions-list">
-        @for (sessionCtrl of sessions.controls; track $index) {
-          <div [formGroupName]="$index" class="session-nested-card">
+        <div formArrayName="sessions" class="sessions-list">
+          @for (sessionCtrl of sessions.controls; track $index) {
+            <div [formGroupName]="$index" class="session-nested-card">
 
-            <div class="session-card-header">
-              <h4>Session n°{{ $index + 1 }}</h4>
-              @if (!isSessionOnly) {
-                <button type="button" class="btn-remove-session" (click)="removeSession($index)">
-                  <span class="material-icons">delete</span>
-                </button>
-              }
-            </div>
-
-            <div class="form-group">
-              <label>Titre de la session *</label>
-              <input type="text" formControlName="titre" placeholder="Ex : Introduction au Deep Learning" />
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Type *</label>
-                <select formControlName="type">
-                  <option value="">Selectionner un type</option>
-                  <option value="Keynote">Keynote</option>
-                  <option value="Workshop">Workshop</option>
-                  <option value="Panel">Table ronde</option>
-                </select>
+              <div class="session-card-header">
+                <h4>Session n°{{ $index + 1 }}</h4>
+                @if (!isSessionOnly) {
+                  <button type="button" class="btn-remove-session" (click)="removeSession($index)">
+                    <span class="material-icons">delete</span>
+                  </button>
+                }
               </div>
 
               <div class="form-group">
-                <label>Capacite max *</label>
-                <input type="number" formControlName="capacite" />
+                <label>Titre de la session *</label>
+                <input type="text" formControlName="titre" placeholder="Ex : Introduction au Deep Learning" />
               </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Type *</label>
+                  <select formControlName="type">
+                    <option value="">Selectionner un type</option>
+                    <option value="Keynote">Keynote</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Panel">Table ronde</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Capacite max *</label>
+                  <input type="number" formControlName="capacite" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Horaire de debut *</label>
+                  <input type="datetime-local" formControlName="horaireDebut" />
+                </div>
+
+                <div class="form-group">
+                  <label>Horaire de fin *</label>
+                  <input type="datetime-local" formControlName="horaireFin" />
+                </div>
+              </div>
+
             </div>
+          }
 
-            <div class="form-row">
-              <div class="form-group">
-                <label>Horaire de debut *</label>
-                <input type="datetime-local" formControlName="horaireDebut" />
-              </div>
-
-              <div class="form-group">
-                <label>Horaire de fin *</label>
-                <input type="datetime-local" formControlName="horaireFin" />
-              </div>
-            </div>
-
-          </div>
-        }
-
-        @if (sessions.length === 0) {
-          <p class="no-session-hint">Aucune session programmee pour l'instant. Vous pourrez en ajouter plus tard.</p>
-        }
-      </div>
+          @if (sessions.length === 0) {
+            <p class="no-session-hint">Aucune session programmee pour l'instant. Vous pourrez en ajouter plus tard.</p>
+          }
+        </div>
+      }
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">
