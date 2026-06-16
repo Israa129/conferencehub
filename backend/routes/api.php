@@ -39,6 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile',          [ProfileController::class, 'show']);
     Route::put('/profile',          [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+
+    Route::post('/conferencier/articles/{id}/statut', [ArticleController::class, 'changerStatut']);
 });
 
 // Routes conférencier (pas encore protégées par auth:sanctum)
