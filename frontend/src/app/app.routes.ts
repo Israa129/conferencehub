@@ -41,10 +41,10 @@ export const routes: Routes = [
   { path: 'participant/conferences', component: ConferenceList },
 
   { path: 'organisateur', component: OrganisateurDashboard },
-  { path: 'organisateur/dashboard', component: OrganisateurDashboard },
   { path: 'organisateur/conferences', component: ConferenceList },
   { path: 'organisateur/validation-articles', component: ValidationArticle },
   { path: 'organisateur/list-articles', component: ListArticle },
+
 
   { path: 'admin/dashboard', component: AdminDashboardComponent },
   { path: 'admin/utilisateurs', component: AdminDashboardComponent },
