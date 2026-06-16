@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Conference;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Log; 
 class ConferenceController extends Controller
 {
     public function index(Request $request)
@@ -29,7 +29,15 @@ class ConferenceController extends Controller
             'organisateur_id'=> 'required|exists:users,id',
         ]);
 
-        return response()->json(Conference::create($data), 201);
+        $conference = Conference::create($data);
+
+        Log::info('Conférence créée avec succès', [
+            'id' => $conference->id,
+            'titre' => $conference->titre,
+            'organisateur_id' => $conference->organisateur_id
+        ]);
+
+        return response()->json($conference, 201);
     }
 
     public function show(Conference $conference)
@@ -50,12 +58,27 @@ class ConferenceController extends Controller
         ]);
 
         $conference->update($data);
+
+        Log::info('Conférence mise à jour', [
+            'id' => $conference->id,
+            'champs_modifies' => array_keys($data)
+        ]);
+
         return response()->json($conference);
     }
 
     public function destroy(Conference $conference)
     {
+        $oldId = $conference->id;
+        $oldTitre = $conference->titre;
+
         $conference->delete();
+
+        Log::warning('Conférence supprimée', [
+            'id' => $oldId,
+            'titre' => $oldTitre
+        ]);
+
         return response()->noContent();
     }
 }
