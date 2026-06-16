@@ -80,10 +80,16 @@
             <div class="card-tags">
               <span class="tag-theme">🏷️ {{ c.theme }}</span>
               
-              @if (getStatutKey(c) === 'ouvert') {
-                <span class="tag-statut ouvert">Débutée / Passée</span>
-              } @else {
-                <span class="tag-statut bientot"> À venir</span>
+              @switch (getBadgeStatus(c)) {
+                @case ('avenir') {
+                  <span class="badge badge-blue">À venir</span>
+                }
+                @case ('active') {
+                  <span class="badge badge-success">En cours</span>
+                }
+                @case ('termine') {
+                  <span class="badge badge-gray">Terminée</span>
+                }
               }
             </div>
 

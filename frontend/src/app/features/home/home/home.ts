@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -45,7 +45,9 @@ export class HomeComponent implements OnInit {
 
   get conferencesFiltrees(): Conference[] {
     let result = this.conferences();
+    const now = new Date();
 
+    // 1. Filtrage par texte (Recherche)
     if (this.recherche.trim()) {
       const q = this.recherche.toLowerCase();
       result = result.filter(c =>
@@ -55,15 +57,24 @@ export class HomeComponent implements OnInit {
       );
     }
 
+    // 2. Filtrage par Thème
     if (this.filtreTheme) {
       const themeLower = this.filtreTheme.toLowerCase();
       result = result.filter(c => c.theme?.toLowerCase().includes(themeLower));
     }
 
+    // 3. FIX : Filtrage par Statut (Passé/En cours VS À venir)
     if (this.filtreStatut) {
-      result = result.filter(c => this.getStatutKey(c) === this.filtreStatut);
+      if (this.filtreStatut === 'ouvert') {
+        // Débutées ou Passées : Date de début est passée ou égale à aujourd'hui
+        result = result.filter(c => new Date(c.date_debut) <= now);
+      } else if (this.filtreStatut === 'bientot') {
+        // À venir : Date de début dans le futur
+        result = result.filter(c => new Date(c.date_debut) > now);
+      }
     }
 
+    // 4. Tri des données
     if (this.tri === 'recent') {
       result = [...result].sort((a, b) => new Date(b.date_debut).getTime() - new Date(a.date_debut).getTime());
     } else if (this.tri === 'ancien') {
@@ -73,15 +84,21 @@ export class HomeComponent implements OnInit {
     return result;
   }
 
-  getStatutKey(c: Conference): 'ouvert' | 'bientot' {
-    const now = new Date();
-    return new Date(c.date_debut) <= now ? 'ouvert' : 'bientot';
-  }
-
   resetFiltres(): void {
     this.recherche = '';
     this.filtreTheme = '';
     this.filtreStatut = '';
     this.tri = 'recent';
+  }
+
+  // Permet l'affichage dynamique des badges sur les cartes (Optionnel mais recommandé pour la clarté)
+  getBadgeStatus(conf: Conference): 'active' | 'termine' | 'avenir' {
+    const now = new Date();
+    const debut = new Date(conf.date_debut);
+    const fin = new Date(conf.date_fin);
+
+    if (debut > now) return 'avenir';
+    if (debut <= now && now <= fin) return 'active';
+    return 'termine';
   }
 }
