@@ -6,6 +6,7 @@ import { Conference } from '../../../core/models/Conference';
 import { SessionConference } from '../../../core/models/SessionConference';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
 import { SessionService } from '../../../core/services/session/session-conference';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-conference-details',
@@ -20,16 +21,20 @@ export class ConferenceDetails implements OnInit {
 
   loading = true;
   loadingSessions = false;
+  deletingSessionId?: number;
+  currentUser: any;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private conferenceService: ConferenceService,
     private sessionService: SessionService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.currentUser = this.auth.getUser();
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
     if (!id) {
@@ -92,15 +97,32 @@ export class ConferenceDetails implements OnInit {
       return;
     }
 
+    this.deletingSessionId = session.id;
+
     this.sessionService.delete(session.id).subscribe({
       next: () => {
         this.sessions = this.sessions.filter(
           (s) => s.id !== session.id
         );
+        this.deletingSessionId = undefined;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.log(error);
+        this.deletingSessionId = undefined;
       },
     });
+  }
+
+  get organisateurName(): string {
+    if (
+      this.currentUser &&
+      this.conference &&
+      Number(this.currentUser.id) === Number(this.conference.organisateur_id)
+    ) {
+      return `${this.currentUser.prenom || ''} ${this.currentUser.nom || ''}`.trim();
+    }
+
+    return this.conference?.organisateur_id?.toString() || '';
   }
 }

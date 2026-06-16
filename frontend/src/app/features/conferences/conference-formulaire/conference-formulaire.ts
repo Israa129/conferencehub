@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {
+  FormArray,
   FormBuilder,
   FormGroup,
-  FormArray,
   FormsModule,
   ReactiveFormsModule,
   Validators
@@ -14,6 +14,7 @@ import { forkJoin, Observable } from 'rxjs';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
 import { Conference } from '../../../core/models/Conference';
 import { SessionService } from '../../../core/services/session/session-conference';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-conference-formulaire',
@@ -25,6 +26,7 @@ import { SessionService } from '../../../core/services/session/session-conferenc
 export class ConferenceFormulaire implements OnInit {
   form: FormGroup;
   isEdit = false;
+  isSessionOnly = false;
   conferenceId?: number;
 
   constructor(
@@ -32,7 +34,8 @@ export class ConferenceFormulaire implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private conferenceService: ConferenceService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private auth: AuthService
   ) {
     this.form = this.fb.group({
       titre: ['', [Validators.required, Validators.maxLength(255)]],
@@ -47,6 +50,18 @@ export class ConferenceFormulaire implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setCurrentOrganisateur();
+
+    const conferenceId = Number(this.route.snapshot.queryParamMap.get('conferenceId'));
+
+    if (conferenceId) {
+      this.isSessionOnly = true;
+      this.conferenceId = conferenceId;
+      this.disableConferenceFields();
+      this.addSession();
+      return;
+    }
+
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
@@ -77,6 +92,10 @@ export class ConferenceFormulaire implements OnInit {
     return this.form.get('sessions') as FormArray;
   }
 
+  get f() {
+    return this.form.controls;
+  }
+
   createSessionGroup(): FormGroup {
     return this.fb.group({
       titre: ['', Validators.required],
@@ -95,11 +114,6 @@ export class ConferenceFormulaire implements OnInit {
     this.sessions.removeAt(index);
   }
 
-  private toDateInput(date: string | Date): string {
-    if (!date) return '';
-    return new Date(date).toISOString().split('T')[0];
-  }
-
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -108,9 +122,13 @@ export class ConferenceFormulaire implements OnInit {
 
     const { sessions, ...conferencePayload } = this.form.value;
 
+    if (this.isSessionOnly && this.conferenceId) {
+      this.createSessions(this.conferenceId, sessions);
+      return;
+    }
+
     this.conferenceService.create(conferencePayload).subscribe({
       next: (newConf) => {
-
         const conferenceId = newConf?.id;
 
         if (!conferenceId) {
@@ -123,40 +141,58 @@ export class ConferenceFormulaire implements OnInit {
           return;
         }
 
-        const requests: Observable<any>[] = sessions.map((s: any) => {
-
-          const payload = {
-            titre: s.titre,
-            type: s.type,
-            capacite: Number(s.capacite),
-
-            horaire_debut: new Date(s.horaireDebut).toISOString(),
-            horaire_fin: new Date(s.horaireFin).toISOString(),
-
-            conference_id: conferenceId
-          };
-
-          return this.sessionService.create(payload as any);
-        });
-
-        forkJoin(requests).subscribe({
-          next: () => {
-            this.router.navigate(['/conferences', conferenceId]);
-          },
-          error: (err) => {
-            console.error('Erreur création sessions:', err);
-            this.router.navigate(['/conferences', conferenceId]);
-          }
-        });
-
+        this.createSessions(conferenceId, sessions);
       },
       error: (err) => {
-        console.error('Erreur création conférence:', err);
+        console.error('Erreur creation conference:', err);
       }
     });
   }
 
-  get f() {
-    return this.form.controls;
+  private createSessions(conferenceId: number, sessions: any[]): void {
+    const requests: Observable<any>[] = sessions.map((s: any) => {
+      const payload = {
+        titre: s.titre,
+        type: s.type,
+        capacite: Number(s.capacite),
+        horaire_debut: new Date(s.horaireDebut).toISOString(),
+        horaire_fin: new Date(s.horaireFin).toISOString(),
+        conference_id: conferenceId
+      };
+
+      return this.sessionService.create(payload as any);
+    });
+
+    forkJoin(requests).subscribe({
+      next: () => {
+        this.router.navigate(['/conferences', conferenceId]);
+      },
+      error: (err) => {
+        console.error('Erreur creation sessions:', err);
+        this.router.navigate(['/conferences', conferenceId]);
+      }
+    });
+  }
+
+  private disableConferenceFields(): void {
+    ['titre', 'description', 'theme', 'lieu', 'date_debut', 'date_fin', 'organisateur_id']
+      .forEach((controlName) => this.form.get(controlName)?.disable());
+  }
+
+  private setCurrentOrganisateur(): void {
+    const user = this.auth.getUser();
+
+    if (!user?.id) {
+      return;
+    }
+
+    this.form.patchValue({
+      organisateur_id: user.id
+    });
+  }
+
+  private toDateInput(date: string | Date): string {
+    if (!date) return '';
+    return new Date(date).toISOString().split('T')[0];
   }
 }

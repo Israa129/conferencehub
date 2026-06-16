@@ -39,6 +39,9 @@ export const routes: Routes = [
   { path: 'participant/conferences', component: ConferenceList },
 
   { path: 'organisateur', component: OrganisateurDashboard },
+  { path: 'organisateur/dashboard', component: OrganisateurDashboard },
+  { path: 'organisateur/conferences', component: ConferenceList },
+
   { path: 'admin/dashboard', component: AdminDashboardComponent },
   { path: 'admin/utilisateurs', component: AdminDashboardComponent },
   { path: 'admin/conferences', component: AdminDashboardComponent },
@@ -52,6 +55,7 @@ export const routes: Routes = [
   { path: 'conferences/new', component: ConferenceFormulaire },
   { path: 'conferences/:id/edit', component: ConferenceFormulaire },
   { path: 'conferences/:id', component: ConferenceDetails },
+  { path: 'sessions/new', component: ConferenceFormulaire },
 
   {
     path: 'conferencier',

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SessionConference extends Model
 {
+    protected $table = 'session_conferences'; 
     protected $fillable = [
         'titre',
         'type',

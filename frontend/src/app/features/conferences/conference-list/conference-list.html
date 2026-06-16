@@ -56,7 +56,9 @@
             @for (conf of filteredConferences; track conf.id) {
               <tr>
                 <td>
-                  <span class="conference-title">{{ conf.titre }}</span>
+                  <a [routerLink]="['/conferences', conf.id]" class="conference-title">
+                    {{ conf.titre }}
+                  </a>
                   <p class="conference-desc-truncate">{{ conf.description }}</p>
                 </td>
                 <td>
@@ -85,6 +87,10 @@
                 </td>
                 <td>
                   <div class="table-actions justify-end">
+                    <a [routerLink]="['/conferences', conf.id]" class="btn btn-ghost btn-sm">
+                      <span class="material-icons">visibility</span>
+                      Voir
+                    </a>
                     <button (click)="onEdit(conf)" class="btn btn-outline btn-sm">
                       <span class="material-icons">edit</span>
                       Modifier
