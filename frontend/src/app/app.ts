@@ -12,13 +12,17 @@ import { Sidebar } from './features/sidebar/sidebar';
 })
 export class App {
   showLayout = true;
+  showNavbar = true;
 
   constructor(private router: Router) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
     const noLayout = ['/login', '/register', '/forgot-password', '/reset-password'];
-    this.showLayout = !noLayout.includes(event.url) && event.url !== '/';
-      }
+    const currentUrl = event.url;
+
+    this.showLayout = !noLayout.includes(currentUrl) && currentUrl !== '/';
+    this.showNavbar = this.showLayout;
+          }
     });
   }
 }

@@ -6,7 +6,7 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class AnalyticsEvent extends Model
 {
-    protected $connection = 'mongodb';
+    protected $connection = 'mongodb_logs';
     protected $collection = 'analytics_events';
 
     protected $fillable = [
