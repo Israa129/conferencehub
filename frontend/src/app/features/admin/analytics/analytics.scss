@@ -1,0 +1,101 @@
+.analytics-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+
+  h1 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; }
+  p { color: #64748b; font-size: 0.9rem; }
+}
+
+.periode-selector {
+  display: flex;
+  gap: 0.5rem;
+
+  button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &.active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+  }
+}
+
+.loading { text-align: center; padding: 3rem; color: #64748b; }
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  grid-column: span 2;
+}
+
+.kpi-icon {
+  width: 48px; height: 48px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  &.orange { background: #fff7ed; }
+}
+
+.kpi-number { font-size: 1.5rem; font-weight: 700; color: #1e293b; display: block; }
+.kpi-label { font-size: 0.85rem; color: #64748b; }
+
+.chart-card, .timeline-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+
+  h3 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem; }
+
+  &.wide { grid-column: span 2; }
+}
+
+.timeline-empty { color: #94a3b8; font-size: 0.875rem; padding: 1rem 0; }
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.85rem;
+  &:last-child { border-bottom: none; }
+}
+
+.timeline-role {
+  background: #eff6ff; color: #1d4ed8;
+  padding: 0.15rem 0.6rem; border-radius: 6px;
+  font-size: 0.75rem; font-weight: 600;
+  flex-shrink: 0;
+}
+
+.timeline-desc { flex: 1; color: #374151; }
+.timeline-date { color: #94a3b8; font-size: 0.75rem; flex-shrink: 0; }
+
+@media (max-width: 768px) {
+  .analytics-grid { grid-template-columns: 1fr; }
+  .chart-card.wide, .timeline-card.wide, .kpi-card { grid-column: span 1; }
+}

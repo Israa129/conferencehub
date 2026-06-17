@@ -10,6 +10,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrganisateurDashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use App\Http\Controllers\AnalyticsController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -29,14 +31,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me',      [AuthController::class, 'me']);
 
-    Route::prefix('admin')->group(function () {
-        Route::get('/dashboard',                [AdminController::class, 'dashboard']);
-        Route::get('/stats',                    [AdminController::class, 'stats']);
-        Route::get('/utilisateurs',             [AdminController::class, 'utilisateurs']);
-        Route::put('/utilisateurs/{id}/role',   [AdminController::class, 'updateRole']);
-        Route::put('/utilisateurs/{id}/statut', [AdminController::class, 'toggleStatut']);
-        Route::delete('/utilisateurs/{id}',     [AdminController::class, 'deleteUser']);
-    });
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard',                [AdminController::class, 'dashboard']);
+    Route::get('/stats',                    [AdminController::class, 'stats']);
+    Route::get('/utilisateurs',             [AdminController::class, 'utilisateurs']);
+    Route::put('/utilisateurs/{id}/role',   [AdminController::class, 'updateRole']);
+    Route::put('/utilisateurs/{id}/statut', [AdminController::class, 'toggleStatut']);
+    Route::delete('/utilisateurs/{id}',     [AdminController::class, 'deleteUser']);
+    Route::get('/analytics',                [AnalyticsController::class, 'index']);
+});
 
     Route::get('/profile',          [ProfileController::class, 'show']);
     Route::put('/profile',          [ProfileController::class, 'update']);

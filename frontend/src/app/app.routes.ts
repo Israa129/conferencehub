@@ -18,6 +18,8 @@ import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-
 import { ProfilePageComponent } from './features/profile/profile-page/profile-page';
 import { ValidationArticle } from './features/organisateur/validation-article/validation-article';
 import { ListArticle } from './features/organisateur/list-article/list-article';
+import { AdminUtilisateurs } from './features/admin/admin-utilisateurs/admin-utilisateurs';
+import { Analytics } from './features/admin/analytics/analytics';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -47,14 +49,14 @@ export const routes: Routes = [
 
 
   { path: 'admin/dashboard', component: AdminDashboardComponent },
-  { path: 'admin/utilisateurs', component: AdminDashboardComponent },
+  { path: 'admin/utilisateurs', component: AdminUtilisateurs },
   { path: 'admin/conferences', component: AdminDashboardComponent },
   { path: 'admin/roles', component: AdminDashboardComponent },
-  { path: 'admin/analytics', component: AdminDashboardComponent },
+  { path: 'admin/analytics', component: Analytics },
   { path: 'admin/logs', component: AdminDashboardComponent },
   { path: 'admin/parametres', component: AdminDashboardComponent },
   { path: 'admin/mailing', component: AdminDashboardComponent },
-
+  { path: 'admin/create-user', component: RegisterComponent },
   { path: 'conferences', component: ConferenceList },
   { path: 'conferences/new', component: ConferenceFormulaire },
   { path: 'conferences/:id/edit', component: ConferenceFormulaire },

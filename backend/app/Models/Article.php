@@ -6,6 +6,9 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class Article extends Model
 {
+    protected $connection = 'mongodb';
+    protected $collection = 'articles';
+
     protected $fillable = [
         'titre',
         'resume',
@@ -27,14 +30,4 @@ class Article extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    public function scopeByConferencier($query, $id)
-    {
-        return $query->where('conferencier_id', $id);
-    }
-
-    public function scopeByStatut($query, $statut)
-    {
-        return $query->where('statut', $statut);
-    }
 }
