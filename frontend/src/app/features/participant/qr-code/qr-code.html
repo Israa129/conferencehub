@@ -1,35 +1,66 @@
-<div class="page-header">
-  <h2>Mon QR Code</h2>
-  <p>Présentez ce QR Code lors de votre arrivée à la conférence.</p>
+<!-- Loading -->
+<div class="db-loading" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
 </div>
 
-<div class="qr-card">
+<!-- Erreur -->
+<div class="error-state" *ngIf="!loading && !qrData">
+  <p>Impossible de charger votre QR Code.</p>
+  <button class="btn-primary" (click)="ngOnInit()">Réessayer</button>
+</div>
 
-  <div class="qr-placeholder">
-    QR CODE
+<!-- Contenu -->
+<div class="page-wrapper" *ngIf="!loading && qrData">
+
+  <div class="page-header">
+    <div>
+      <h1>Mon QR Code</h1>
+      <p>Présentez ce QR Code lors de votre arrivée à la conférence.</p>
+    </div>
   </div>
 
-  <div class="info">
-    <p>
-      <strong>Participant :</strong>
-      {{ qrData.participant }}
-    </p>
+  <div class="qr-card">
 
-    <p>
-      <strong>Conférence :</strong>
-      {{ qrData.conference }}
-    </p>
+    <!-- Badge statut -->
+    <div class="qr-top">
+      <span class="badge badge-actif">{{ qrData.statut }}</span>
+    </div>
 
-    <p>
-      <strong>Statut :</strong>
-      <span class="badge">
-        {{ qrData.status }}
-      </span>
-    </p>
+    <!-- QR Code canvas -->
+    <div class="qr-canvas-wrapper">
+      <canvas #qrCanvas></canvas>
+    </div>
+
+    <!-- ID participant -->
+    <p class="qr-id">ID — {{ qrData.participantId ?? qrData.participant }}</p>
+
+    <!-- Infos -->
+    <div class="qr-info">
+      <div class="info-row">
+        <span class="info-label">👤 Participant</span>
+        <span class="info-value">{{ qrData.participant }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">🎓 Conférence</span>
+        <span class="info-value">{{ qrData.conference }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">✅ Statut</span>
+        <span class="info-value text-success">{{ qrData.statut }}</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="btn-group">
+      <button class="btn-primary" (click)="telecharger()">
+        ⬇ Télécharger
+      </button>
+      <button class="btn-outline" (click)="partager()">
+        ↗ Partager
+      </button>
+    </div>
+
   </div>
-
-  <button>
-    Télécharger le QR
-  </button>
 
 </div>

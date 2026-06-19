@@ -4,6 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
 import { Conference } from '../../../core/models/Conference';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-conference-list',
@@ -20,8 +21,13 @@ export class ConferenceList implements OnInit {
 
   constructor(
     private conferenceService: ConferenceService,
-    private router: Router
+    private router: Router,
+    private auth: AuthService
   ) {}
+
+  get isParticipant(): boolean {
+    return this.auth.getUser()?.role === 'participant';
+  }
 
   ngOnInit(): void {
     this.loadConferences();
@@ -87,12 +93,15 @@ export class ConferenceList implements OnInit {
 
   onDelete(id: number): void {
     if (!confirm('Supprimer cette conférence ?')) return;
-
     this.conferenceService.delete(id).subscribe({
       next: () => {
         this.conferences.update(list => list.filter(c => c.id !== id));
       },
       error: (err) => console.error('Erreur suppression', err)
     });
+  }
+
+  sInscrire(conf: Conference): void {
+    this.router.navigate(['/conferences', conf.id]);
   }
 }

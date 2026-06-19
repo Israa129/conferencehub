@@ -1,20 +1,72 @@
-<div class="page-header">
-  <h2>Mes attestations</h2>
-  <p>Téléchargez vos attestations de participation.</p>
+<!-- Loading -->
+<div class="db-loading" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
 </div>
 
-<div
-  class="certificate-card"
-  *ngFor="let certificate of certificates">
+<!-- Erreur -->
+<div class="error-state" *ngIf="erreur && !loading">
+  <p>Impossible de charger vos attestations.</p>
+  <button class="btn-primary" (click)="charger()">Réessayer</button>
+</div>
 
-  <h3>{{ certificate.conference }}</h3>
+<!-- Contenu -->
+<div class="page-wrapper" *ngIf="!loading && !erreur">
 
-  <p>
-    📅 {{ certificate.date }}
-  </p>
+  <div class="page-header">
+    <h1>Mes attestations</h1>
+    <p>Téléchargez vos attestations de participation.</p>
+  </div>
 
-  <button>
-    Télécharger PDF
-  </button>
+  <!-- Vide -->
+  <div class="empty-state" *ngIf="inscriptions.length === 0">
+    <div class="empty-icon">📜</div>
+    <h3>Aucune attestation disponible</h3>
+    <p>Vos attestations seront disponibles 48h après la fin de chaque conférence, sous réserve de votre présence enregistrée par QR Code.</p>
+  </div>
+
+  <!-- Liste -->
+  <div class="certificates-list" *ngIf="inscriptions.length > 0">
+    <div class="certificate-card" *ngFor="let ins of inscriptions">
+
+      <div class="card-left">
+        <div class="card-icon">📜</div>
+      </div>
+
+      <div class="card-body">
+        <h3>{{ ins.conference?.nom }}</h3>
+        <div class="card-meta">
+          <span>📍 {{ ins.conference?.lieu }}</span>
+          <span>📅 {{ ins.conference?.dates }}</span>
+          <span>🗓 Inscrit le {{ ins.date_inscription }}</span>
+        </div>
+
+        <!-- Statut attestation -->
+        <div class="attestation-status" *ngIf="!aAttestation(ins)">
+          <span class="badge badge-pend">⏳ En attente — disponible 48h après la conférence</span>
+        </div>
+        <div class="attestation-status" *ngIf="aAttestation(ins)">
+          <span class="badge badge-conf">✓ Attestation disponible</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button
+          class="btn-primary"
+          (click)="telechargerPDF(ins)"
+          [disabled]="!aAttestation(ins)"
+          [class.btn-disabled]="!aAttestation(ins)">
+          ⬇ Télécharger PDF
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Info box -->
+  <div class="info-box">
+    ℹ️ Les attestations sont générées automatiquement <strong>48h après la fin de la conférence</strong>,
+    sous réserve de votre présence enregistrée par QR Code.
+  </div>
 
 </div>

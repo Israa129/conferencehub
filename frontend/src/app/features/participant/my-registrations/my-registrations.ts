@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { ParticipantService } from '../../../core/services/participant.service';
 
 @Component({
   selector: 'app-my-registrations',
@@ -8,19 +10,49 @@ import { CommonModule } from '@angular/common';
   templateUrl: './my-registrations.html',
   styleUrl: './my-registrations.scss',
 })
-export class MyRegistrations {
+export class MyRegistrations implements OnInit {
 
-  registrations = [
-    {
-      title: 'ICIA 2025',
-      location: 'Paris',
-      status: 'Confirmée'
-    },
-    {
-      title: 'DataScience World Forum',
-      location: 'Lyon',
-      status: 'En attente'
-    }
-  ];
+  inscriptions: any[] = [];
+  loading = true;
+  erreur = false;
 
+  constructor(
+    private participantService: ParticipantService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    this.charger();
+  }
+
+  charger() {
+    this.loading = true;
+    this.erreur = false;
+
+    this.participantService.getInscriptions().subscribe({
+      next: (data: any) => {
+        this.inscriptions = data.inscriptions ?? [];
+        this.loading = false;
+        this.cdr.detectChanges(); // ← ajout
+      },
+      error: () => {
+        this.erreur = true;
+        this.loading = false;
+        this.cdr.detectChanges(); // ← ajout
+      }
+    });
+  }
+
+  voirConference(conferenceId: number) {
+    this.router.navigate(['/conferences', conferenceId]);
+  }
+
+  voirConferences() {
+    this.router.navigate(['/participant/conferences']);
+  }
+
+  retourDashboard() {
+    this.router.navigate(['/participant/dashboard']);
+  }
 }

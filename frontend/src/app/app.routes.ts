@@ -12,7 +12,6 @@ import { ConferencierLayout } from './features/conferencier/conferencier-layout/
 import { Dashboard } from './features/participant/dashboard/dashboard';
 import { QrCode } from './features/participant/qr-code/qr-code';
 import { Certificates } from './features/participant/certificates/certificates';
-import { Settings } from './features/participant/settings/settings';
 import { OrganisateurDashboard } from './features/organisateur/organisateur-dashboard/organisateur-dashboard';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
 import { ProfilePageComponent } from './features/profile/profile-page/profile-page';
@@ -40,7 +39,6 @@ export const routes: Routes = [
   },
   { path: 'participant/qr-code', component: QrCode },
   { path: 'participant/certificates', component: Certificates },
-  { path: 'participant/settings', component: Settings },
   { path: 'participant/conferences', component: ConferenceList },
 
   { path: 'organisateur/dashboard', component: OrganisateurDashboard },

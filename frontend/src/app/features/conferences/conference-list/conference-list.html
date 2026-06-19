@@ -1,7 +1,8 @@
 <div class="page-header">
   <div>
     <h1>Conférences</h1>
-    <p>Parcourez et gérez toutes les conférences</p>
+    <p *ngIf="!isParticipant">Parcourez et gérez toutes les conférences</p>
+    <p *ngIf="isParticipant">Parcourez et inscrivez-vous aux conférences</p>
   </div>
   <div class="header-actions">
     <div class="search-bar">
@@ -12,7 +13,8 @@
         [(ngModel)]="searchQuery"
       />
     </div>
-    <a routerLink="/conferences/new" class="btn btn-primary">
+    <!-- Bouton visible uniquement pour non-participants -->
+    <a *ngIf="!isParticipant" routerLink="/conferences/new" class="btn btn-primary">
       <span class="material-icons">add</span>
       Nouvelle conférence
     </a>
@@ -31,7 +33,7 @@
     <div class="empty-state">
       <span class="material-icons empty-icon">mic</span>
       <p>Aucune conférence trouvée.</p>
-      <a routerLink="/conferences/new" class="btn btn-primary mt-4">
+      <a *ngIf="!isParticipant" routerLink="/conferences/new" class="btn btn-primary mt-4">
         Créer la première
       </a>
     </div>
