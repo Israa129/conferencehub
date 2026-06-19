@@ -26,6 +26,10 @@ Route::post('/login',    [AuthController::class, 'login']);
 Route::apiResource('conferences', ConferenceController::class);
 Route::apiResource('sessions',    SessionConferenceController::class);
 Route::post('/conferencier/articles/{id}/statut', [ArticleController::class, 'changerStatut']);
+Route::get('/conferences/organisateur/{organisateur_id}', [ConferenceController::class, 'getByOrganisateur']);
+Route::get('/dashboard/stats/{organisateur_id}', [OrganisateurDashboardController::class, 'getDashboardStats']);
+Route::apiResource('sessions',    SessionConferenceController::class);
+Route::post('/conferencier/articles/{id}/statut', [ArticleController::class, 'changerStatut']);
 Route::get('organisateur/dashboard-stats', [OrganisateurDashboardController::class, 'getDashboardStats']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
