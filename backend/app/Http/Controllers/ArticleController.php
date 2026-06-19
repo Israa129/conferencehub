@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use App\Services\ArticleService; // On importe ton service !
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -11,156 +10,115 @@ use Illuminate\Support\Str;
 
 class ArticleController extends Controller
 {
-    protected $articleService;
-
-    // 1. On injecte proprement ton ArticleService via le constructeur
-    public function __construct(ArticleService $articleService)
-    {
-        $this->articleService = $articleService;
-    }
-
     /**
      * GET /api/conferencier/articles
-     * Liste tous les articles filtrés du conférencier connecté
      */
     public function index(Request $request): JsonResponse
     {
-        $conferencier_id = $request->user()->id ?? $request->header('X-User-Id');
+        $userId = $request->header('X-User-Id');
 
-        // On prépare les filtres pour le Service
-        $filters = [
-            'conferencier_id' => $conferencier_id
-        ];
+        $query = Article::with(['conference', 'session'])
+            ->where('user_id', $userId);
 
         if ($request->has('statut') && $request->statut !== 'tous') {
-            $filters['statut'] = $request->statut;
+            $query->where('statut', $request->statut);
         }
         if ($request->has('conference_id')) {
-            $filters['conference_id'] = $request->conference_id;
+            $query->where('conference_id', $request->conference_id);
         }
 
-        // 2. On utilise TON service pour récupérer la liste filtrée
-        $articles = $this->articleService->list($filters);
+        $articles = $query->orderBy('created_at', 'desc')->get();
 
-        // Statistiques calculées à la volée pour Angular
+        $mapped = $articles->map(fn($a) => $this->formatArticle($a));
+
         $stats = [
-            'total'       => $articles->count(),
-            'en_revision' => $articles->where('statut', 'en_revision')->count(),
-            'accepte'     => $articles->where('statut', 'accepte')->count(),
-            'refuse'      => $articles->where('statut', 'refuse')->count(),
+            'total'          => $articles->count(),
+            'en_revision'    => $articles->where('statut', 'en_revision')->count(),
+            'accepte'        => $articles->where('statut', 'accepte')->count(),
+            'refuse'         => $articles->where('statut', 'refuse')->count(),
+            'par_conference' => $articles->groupBy('conference_id')
+                ->map(fn($g) => $g->count())->toArray(),
         ];
 
-        return response()->json([
-            'success' => true,
-            'data'    => $articles,
-            'stats'   => $stats,
-        ]);
-    }
-
-    /**
-     * GET /api/conferencier/articles/{id}
-     */
-    public function show(Request $request, string $id): JsonResponse
-    {
-        $conferencier_id = $request->user()->id ?? $request->header('X-User-Id');
-        
-        // Sécurité : On s'assure que l'article appartienne bien au conférencier connecté
-        $article = Article::where('id', $id)->where('conferencier_id', $conferencier_id)->firstOrFail();
-
-        return response()->json([
-            'success' => true,
-            'data'    => $article,
-        ]);
+        return response()->json(['success' => true, 'data' => $mapped, 'stats' => $stats]);
     }
 
     /**
      * POST /api/conferencier/articles
-     * Soumettre un nouvel article
      */
     public function store(Request $request): JsonResponse
     {
         $request->validate([
             'titre'         => 'required|string|max:255',
             'resume'        => 'required|string|max:2000',
-            'mots_cles'     => 'required|array|min:1|max:10',
+            'mots_cles'     => 'required|array|min:1',
             'mots_cles.*'   => 'string|max:50',
-            'conference_id' => 'required|string',
-            'fichier_pdf'   => 'required|file|mimes:pdf|max:10240', // 10MB max
+            'conference_id' => 'required|integer|exists:conferences,id',
+            'session_id'    => 'nullable|integer|exists:sessions_conference,id',
+            'fichier_pdf'   => 'required|file|mimes:pdf|max:10240',
         ]);
 
-        // Upload PDF
-        $fichier = $request->file('fichier_pdf');
+        $userId = $request->header('X-User-Id');
+
+        $fichier    = $request->file('fichier_pdf');
         $nomFichier = Str::uuid() . '_' . Str::slug($request->titre) . '.pdf';
-        $chemin = $fichier->storeAs('articles', $nomFichier, 'public');
+        $chemin     = $fichier->storeAs('articles', $nomFichier, 'public');
 
-        $conferencier_id = $request->user()->id ?? $request->header('X-User-Id');
-
-        // 3. On passe par ton service pour la création
-        $article = $this->articleService->create([
-            'titre'            => $request->titre,
-            'resume'           => $request->resume,
-            'mots_cles'        => $request->mots_cles,
-            'fichier_pdf'      => $chemin,
-            'statut'           => 'en_revision',
-            'conference_id'    => $request->conference_id,
-            'conference_nom'   => $request->conference_nom ?? '',
-            'conference_lieu'  => $request->conference_lieu ?? '',
-            'conferencier_id'  => $conferencier_id,
-            'conferencier_nom' => $request->user()->name ?? $request->header('X-User-Name'),
-            'commentaires'     => null,
+        $article = Article::create([
+            'user_id'       => $userId,
+            'conference_id' => $request->conference_id,
+            'session_id'    => $request->session_id ?? null,
+            'titre'         => $request->titre,
+            'resume'        => $request->resume,
+            'mots_cles'     => $request->mots_cles,
+            'fichier_pdf'   => $chemin,
+            'statut'        => 'en_revision',
+            'commentaires'  => null,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Article soumis avec succès.',
-            'data'    => $article,
+            'data'    => $this->formatArticle($article->load(['conference', 'session'])),
         ], 201);
     }
 
     /**
-     * POST /api/conferencier/articles/{id} (Utilisé pour l'update multipart)
+     * POST /api/conferencier/articles/{id}
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        $conferencier_id = $request->user()->id ?? $request->header('X-User-Id');
-        
-        // Sécurité : Vérifier le propriétaire
-        $article = Article::where('id', $id)->where('conferencier_id', $conferencier_id)->firstOrFail();
+        $userId  = $request->header('X-User-Id');
+        $article = Article::where('id', $id)->where('user_id', $userId)->firstOrFail();
 
         if ($article->statut !== 'en_revision') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Modification impossible : l\'article n\'est plus en révision.',
-            ], 403);
+            return response()->json(['success' => false, 'message' => 'Modification impossible.'], 403);
         }
 
         $request->validate([
             'titre'       => 'sometimes|string|max:255',
             'resume'      => 'sometimes|string|max:2000',
-            'mots_cles'   => 'sometimes|array|min:1|max:10',
+            'mots_cles'   => 'sometimes|array|min:1',
             'mots_cles.*' => 'string|max:50',
+            'session_id'  => 'nullable|integer|exists:sessions_conference,id',
             'fichier_pdf' => 'sometimes|file|mimes:pdf|max:10240',
         ]);
 
-        $data = $request->only(['titre', 'resume', 'mots_cles']);
+        $data = $request->only(['titre', 'resume', 'mots_cles', 'session_id']);
 
-        // Nouveau PDF si fourni
         if ($request->hasFile('fichier_pdf')) {
-            if ($article->fichier_pdf) {
-                Storage::disk('public')->delete($article->fichier_pdf);
-            }
-            $fichier    = $request->file('fichier_pdf');
+            if ($article->fichier_pdf) Storage::disk('public')->delete($article->fichier_pdf);
+            $fichier = $request->file('fichier_pdf');
             $nomFichier = Str::uuid() . '_' . Str::slug($request->titre ?? $article->titre) . '.pdf';
             $data['fichier_pdf'] = $fichier->storeAs('articles', $nomFichier, 'public');
         }
 
-        // 4. On passe par ton service pour l'update
-        $updatedArticle = $this->articleService->update($id, $data);
+        $article->update($data);
 
         return response()->json([
             'success' => true,
             'message' => 'Article mis à jour.',
-            'data'    => $updatedArticle,
+            'data'    => $this->formatArticle($article->fresh()->load(['conference', 'session'])),
         ]);
     }
 
@@ -169,27 +127,17 @@ class ArticleController extends Controller
      */
     public function destroy(Request $request, string $id): JsonResponse
     {
-        $conferencier_id = $request->user()->id ?? $request->header('X-User-Id');
-        $article = Article::where('id', $id)->where('conferencier_id', $conferencier_id)->firstOrFail();
+        $userId  = $request->header('X-User-Id');
+        $article = Article::where('id', $id)->where('user_id', $userId)->firstOrFail();
 
         if ($article->statut !== 'en_revision') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Suppression impossible : seuls les articles en révision peuvent être supprimés.',
-            ], 403);
+            return response()->json(['success' => false, 'message' => 'Suppression impossible.'], 403);
         }
 
-        if ($article->fichier_pdf) {
-            Storage::disk('public')->delete($article->fichier_pdf);
-        }
+        if ($article->fichier_pdf) Storage::disk('public')->delete($article->fichier_pdf);
+        $article->delete();
 
-        // 5. On utilise ton service pour supprimer
-        $this->articleService->delete($id);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Article supprimé.',
-        ]);
+        return response()->json(['success' => true, 'message' => 'Article supprimé.']);
     }
 
     /**
@@ -197,11 +145,11 @@ class ArticleController extends Controller
      */
     public function download(Request $request, string $id): mixed
     {
-        $conferencier_id = $request->user()->id ?? $request->header('X-User-Id');
-        $article = Article::where('id', $id)->where('conferencier_id', $conferencier_id)->firstOrFail();
+        $userId  = $request->header('X-User-Id');
+        $article = Article::where('id', $id)->where('user_id', $userId)->firstOrFail();
 
         if (!$article->fichier_pdf || !Storage::disk('public')->exists($article->fichier_pdf)) {
-            return response()->json(['success' => false, 'message' => 'Fichier introuvable.'], 404);
+            return response()->json(['message' => 'Fichier introuvable.'], 404);
         }
 
         return Storage::disk('public')->download($article->fichier_pdf, Str::slug($article->titre) . '.pdf');
@@ -212,21 +160,39 @@ class ArticleController extends Controller
      */
     public function stats(Request $request): JsonResponse
     {
-        $conferencier_id = $request->user()->id ?? $request->header('X-User-Id');
+        $userId   = $request->header('X-User-Id');
+        $articles = Article::where('user_id', $userId)->get();
 
-        // On utilise ton service avec le filtre du conférencier
-        $articles = $this->articleService->list(['conferencier_id' => $conferencier_id]);
-
-        $stats = [
+        return response()->json(['success' => true, 'data' => [
             'total'          => $articles->count(),
             'en_revision'    => $articles->where('statut', 'en_revision')->count(),
             'accepte'        => $articles->where('statut', 'accepte')->count(),
             'refuse'         => $articles->where('statut', 'refuse')->count(),
-            'par_conference' => $articles->groupBy('conference_nom')
-                ->map(fn($g) => $g->count())
-                ->toArray(),
-        ];
+            'par_conference' => $articles->groupBy('conference_id')->map(fn($g) => $g->count())->toArray(),
+        ]]);
+    }
 
-        return response()->json(['success' => true, 'data' => $stats]);
+    /**
+     * Formater un article pour Angular (noms de champs compatibles avec le dashboard)
+     */
+    private function formatArticle(Article $a): array
+    {
+        return [
+            '_id'              => (string) $a->id,
+            'titre'            => $a->titre,
+            'resume'           => $a->resume,
+            'mots_cles'        => $a->mots_cles ?? [],
+            'fichier_pdf'      => $a->fichier_pdf,
+            'statut'           => $a->statut,
+            'commentaires'     => $a->commentaires,
+            'conference_id'    => (string) $a->conference_id,
+            'conference_nom'   => $a->conference?->titre ?? '',
+            'conference_lieu'  => $a->conference?->lieu ?? '',
+            'conferencier_id'  => (string) $a->user_id,
+            'conferencier_nom' => $a->auteur?->name ?? '',
+            'session_assignee' => $a->session?->titre ?? $a->session?->nom ?? '',
+            'created_at'       => $a->created_at?->toISOString(),
+            'updated_at'       => $a->updated_at?->toISOString(),
+        ];
     }
 }
