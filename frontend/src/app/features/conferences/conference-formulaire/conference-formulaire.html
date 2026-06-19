@@ -20,10 +20,49 @@
         <label>Titre *</label>
         <input type="text" formControlName="titre" placeholder="Ex : DevFest 2025" />
 
+<<<<<<< Updated upstream
         @if (f['titre'].touched && f['titre'].errors?.['required']) {
           <small style="color:var(--danger);font-size:12px;">
             Le titre est requis.
           </small>
+=======
+          @if (f['titre'].touched && f['titre'].errors?.['required']) {
+            <small class="error-text">Le titre est requis.</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea formControlName="description" placeholder="Decrivez la conference..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Theme *</label>
+            <input type="text" formControlName="theme" placeholder="Ex : Intelligence Artificielle" />
+          </div>
+
+          <div class="form-group">
+            <label>Lieu *</label>
+            <input type="text" formControlName="lieu" placeholder="Ex : Paris, France" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date de debut *</label>
+            <input type="datetime-local" formControlName="date_debut" />
+          </div>
+
+          <div class="form-group">
+            <label>Date de fin *</label>
+            <input type="datetime-local" formControlName="date_fin" />
+          </div>
+        </div>
+
+        @if (!isEdit) {
+          <hr class="form-separator" />
+>>>>>>> Stashed changes
         }
       </div>
 

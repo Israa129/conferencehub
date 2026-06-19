@@ -58,4 +58,15 @@ class ConferenceController extends Controller
         $conference->delete();
         return response()->noContent();
     }
+    public function getByOrganisateur($organisateur_id)
+    {
+        $conferences = Conference::where('organisateur_id', $organisateur_id)->get();
+
+         Log::info('Récupération des conférences pour l\'organisateur', [
+            'organisateur_id' => $organisateur_id,
+            'nombre_conferences' => $conferences->count()
+        ]);
+        
+        return response()->json($conferences);
+    }
 }

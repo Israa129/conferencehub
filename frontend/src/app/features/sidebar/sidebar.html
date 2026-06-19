@@ -1,0 +1,107 @@
+<aside class="sidebar" *ngIf="showSidebar">
+
+  <!-- Profil -->
+  <div class="sidebar-profile">
+    <div class="avatar" [class.avatar-admin]="userState.user()?.role === 'admin'">
+      {{ userState.user()?.prenom?.charAt(0) }}{{ userState.user()?.nom?.charAt(0) }}
+    </div>
+    <div class="user-info">
+      <span class="user-name">{{ userState.user()?.prenom }} {{ userState.user()?.nom }}</span>
+      <span class="user-role">{{ userState.user()?.role | titlecase }}</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <!-- PARTICIPANT -->
+    <ng-container *ngIf="userState.user()?.role === 'participant'">
+      <a class="nav-item" routerLink="/participant/dashboard" routerLinkActive="active">
+        <span>🏠</span> Tableau de bord
+      </a>
+      <a class="nav-item" routerLink="/conferences" routerLinkActive="active">
+        <span>🎓</span> Conférences
+      </a>
+      <a class="nav-item" routerLink="/participant/my-registrations" routerLinkActive="active">
+        <span>📋</span> Mes inscriptions
+      </a>
+      <a class="nav-item" routerLink="/participant/qr-code" routerLinkActive="active">
+        <span>📱</span> Mon QR Code
+      </a>
+      <a class="nav-item" routerLink="/participant/certificates" routerLinkActive="active">
+        <span>📜</span> Mes attestations
+      </a>
+    </ng-container>
+
+    <!-- CONFÉRENCIER -->
+    <ng-container *ngIf="userState.user()?.role === 'conferencier'">
+      <a class="nav-item" routerLink="/conferencier/dashboard" routerLinkActive="active">
+        <span>🏠</span> Tableau de bord
+      </a>
+      <a class="nav-item" routerLink="/conferencier/articles" routerLinkActive="active">
+        <span>📄</span> Mes articles
+      </a>
+      <a class="nav-item" routerLink="/conferencier/soumettre" routerLinkActive="active">
+        <span>➕</span> Soumettre un article
+      </a>
+      <a class="nav-item" routerLink="/conferencier/archives" routerLinkActive="active">
+        <span>🗂️</span> Archives
+      </a>
+    </ng-container>
+
+    <!-- ORGANISATEUR -->
+    <ng-container *ngIf="userState.user()?.role === 'organisateur'">
+      <a class="nav-item" routerLink="/organisateur/dashboard" routerLinkActive="active">
+        Tableau de bord
+      </a>
+      <a class="nav-item" routerLink="/organisateur/conferences" routerLinkActive="active">
+        Mes conférences
+      </a>
+      <a class="nav-item" routerLink="/organisateur/list-articles" routerLinkActive="active">
+         Articles à valider
+      </a>
+    </ng-container>
+
+    <!-- ADMIN -->
+    <ng-container *ngIf="userState.user()?.role === 'admin'">
+      <span class="nav-section">SYSTÈME</span>
+      <a class="nav-item" routerLink="/admin/dashboard" routerLinkActive="active">
+        <span>🏠</span> Vue d'ensemble
+      </a>
+      <a class="nav-item" routerLink="/admin/utilisateurs" routerLinkActive="active">
+        <span>👥</span> Utilisateurs
+      </a>
+      <a class="nav-item" routerLink="/participant/conferences" routerLinkActive="active">
+        <span>🎓</span> Conférences
+      </a>
+      <a class="nav-item" routerLink="/admin/roles" routerLinkActive="active">
+        <span>🔑</span> Rôles & Permissions
+      </a>
+      <a class="nav-item" routerLink="/admin/analytics" routerLinkActive="active">
+        <span>📊</span> Analytics
+      </a>
+      <a class="nav-item" routerLink="/admin/logs" routerLinkActive="active">
+        <span>📋</span> Journaux d'audit
+      </a>
+      <span class="nav-section">CONFIGURATION</span>
+      <a class="nav-item" routerLink="/admin/parametres" routerLinkActive="active">
+        <span>⚙️</span> Paramètres
+      </a>
+      <a class="nav-item" routerLink="/admin/mailing" routerLinkActive="active">
+        <span>✉️</span> Mailing
+      </a>
+    </ng-container>
+
+    <!-- COMMUN -->
+    <div class="sidebar-divider"></div>
+    <a class="nav-item" routerLink="/profile" routerLinkActive="active">
+      <span>👤</span> Mon profil
+    </a>
+    <a class="nav-item" routerLink="/participant/settings" routerLinkActive="active">
+  <span>⚙️</span> Paramètres
+</a>
+    <a class="nav-item logout" (click)="logout()">
+      <span>🚪</span> Déconnexion
+    </a>
+
+  </nav>
+</aside>
