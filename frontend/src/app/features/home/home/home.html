@@ -1,8 +1,7 @@
-<!-- ── HERO ── -->
 <section class="hero">
   <div class="hero-badge">
     <span class="dot"></span>
-    247 conférences actives dans 38 pays
+    {{ conferences().length }} conférences scientifiques répertoriées
   </div>
 
   <h1>
@@ -11,145 +10,115 @@
   </h1>
 
   <p class="hero-sub">
-    Inscriptions, soumissions d'articles et certificats de participation —<br>
-    tout en un seul endroit.
+    Inscriptions, événements et opportunités de recherche académique —<br>
+    le tout centralisé sur une seule plateforme.
   </p>
 
   <div class="search-bar">
     <span class="search-icon">🔍</span>
     <input
       [(ngModel)]="recherche"
-      (ngModelChange)="filtrer()"
-      placeholder="Rechercher une conférence, un domaine, un pays..."
+      placeholder="Rechercher une conférence, un domaine, un lieu..."
     />
-    <button (click)="filtrer()">Rechercher</button>
+    <button>Rechercher</button>
   </div>
 
   <div class="tendances">
     <span>Tendances :</span>
     <button
       *ngFor="let t of tendances"
-      (click)="filtreTheme = t; filtrer()"
+      (click)="filtreTheme = (filtreTheme === t ? '' : t)"
       [class.active]="filtreTheme === t"
     >{{ t }}</button>
   </div>
-
-  <div class="stats">
-    <div class="stat">
-      <strong>1240+</strong>
-      <span>Scientifiques inscrits</span>
-    </div>
-    <div class="separator"></div>
-    <div class="stat">
-      <strong>38</strong>
-      <span>Pays représentés</span>
-    </div>
-    <div class="separator"></div>
-    <div class="stat">
-      <strong>892</strong>
-      <span>Articles publiés</span>
-    </div>
-  </div>
 </section>
 
-<!-- ── LISTE CONFÉRENCES ── -->
 <section class="conferences-section">
 
   <div class="section-header">
     <div>
       <h2>Conférences disponibles</h2>
-      <p class="results-count">
-        <strong>{{ conferencesFiltrees.length }} résultats</strong>
-        <span *ngIf="filtreTheme"> dans <span class="tag-blue">{{ filtreTheme }}</span></span>
-      </p>
+      @if (isLoaded()) {
+        <p class="results-count">
+          <strong>{{ conferencesFiltrees.length }} résultats</strong>
+          <span *ngIf="filtreTheme"> dans <span class="tag-blue">{{ filtreTheme }}</span></span>
+        </p>
+      }
     </div>
 
     <div class="filtres">
-      <!-- Filtre thème actif -->
       <span *ngIf="filtreTheme" class="tag-filter">
         {{ filtreTheme }}
-        <button (click)="filtreTheme = ''; filtrer()">✕</button>
+        <button (click)="filtreTheme = ''">✕</button>
       </span>
 
-      <!-- Filtre statut actif -->
       <span *ngIf="filtreStatut" class="tag-filter">
-        {{ filtreStatut === 'ouvert' ? 'Ouvertes' : 'Bientôt' }}
-        <button (click)="filtreStatut = ''; filtrer()">✕</button>
+        {{ filtreStatut === 'ouvert' ? 'En cours / Clôturées' : 'À venir' }}
+        <button (click)="filtreStatut = ''">✕</button>
       </span>
 
-      <!-- Tri -->
       <select [(ngModel)]="tri" class="select-tri">
         <option value="recent">Les plus récentes</option>
-        <option value="capacite">Par capacité</option>
+        <option value="ancien">Chronologique inverse</option>
       </select>
 
-      <!-- Filtre statut -->
-      <select [(ngModel)]="filtreStatut" (ngModelChange)="filtrer()" class="select-tri">
+      <select [(ngModel)]="filtreStatut" class="select-tri">
         <option value="">Tous les statuts</option>
-        <option value="ouvert">Inscriptions ouvertes</option>
-        <option value="bientot">Bientôt</option>
+        <option value="ouvert">Débutées / Passées</option>
+        <option value="bientot">À venir</option>
       </select>
     </div>
   </div>
 
-  <!-- Cartes conférences -->
-  <div class="conference-list">
-    <div class="conference-card" *ngFor="let c of conferencesFiltrees">
+  @if (isLoaded()) {
+    <div class="conference-list">
+      
+      @for (c of conferencesFiltrees; track c.id) {
+        <div class="conference-card">
+          <div class="card-body">
+            
+            <div class="card-tags">
+              <span class="tag-theme">🏷️ {{ c.theme }}</span>
+              
+              @switch (getBadgeStatus(c)) {
+                @case ('avenir') {
+                  <span class="badge badge-blue">À venir</span>
+                }
+                @case ('active') {
+                  <span class="badge badge-success">En cours</span>
+                }
+                @case ('termine') {
+                  <span class="badge badge-gray">Terminée</span>
+                }
+              }
+            </div>
 
-      <div class="card-body">
-        <div class="card-tags">
-          <span class="tag-theme">🏷️ {{ c.theme }}</span>
-          <span class="tag-statut ouvert" *ngIf="c.statut === 'ouvert'">
-            ● Inscriptions ouvertes
-          </span>
-          <span class="tag-statut bientot" *ngIf="c.statut === 'bientot'">
-            ● Bientôt
-          </span>
-          <span class="tag-type">{{ c.type }}</span>
-        </div>
+            <h3>{{ c.titre }}</h3>
+            <p class="organisateur">{{ c.description }}</p>
 
-        <h3>{{ c.titre }}</h3>
-        <p class="organisateur">{{ c.organisateur }}</p>
+            <div class="card-meta">
+              <span>📅 {{ c.date_debut | date:'dd MMM yyyy' }} – {{ c.date_fin | date:'dd MMM yyyy' }}</span>
+              <span>📍 {{ c.lieu }}</span>
+            </div>
 
-        <div class="card-meta">
-          <span>📅 {{ c.date_debut | date:'d MMM yyyy' }} – {{ c.date_fin | date:'d MMM yyyy' }}</span>
-          <span>📍 {{ c.lieu }}</span>
-          <span *ngIf="c.soumission">⏰ Soumission : {{ c.soumission }}</span>
-        </div>
-
-        <!-- Barre de capacité -->
-        <div class="capacite-bar">
-          <div class="bar-label">
-            <span>Capacité</span>
-            <strong>{{ c.inscrits }} / {{ c.capacite }} places</strong>
           </div>
-          <div class="bar-bg">
-            <div
-              class="bar-fill"
-              [style.width.%]="getCapacitePercent(c)"
-              [style.background]="getCapaciteColor(c)"
-            ></div>
-          </div>
-          <p class="places-restantes" *ngIf="getCapacitePercent(c) >= 70">
-            ⚠️ Plus que {{ c.capacite - c.inscrits }} places disponibles
-          </p>
-        </div>
-      </div>
 
-      <div class="card-action">
-        <button class="btn-voir" [routerLink]="['/conferences', c.id]">
-          Voir & s'inscrire
-        </button>
-        <button class="btn-fav">🤍</button>
-      </div>
+          <div class="card-action">
+            <button class="btn-voir" [routerLink]="['/conferences', c.id]">
+              Voir les détails
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (conferencesFiltrees.length === 0) {
+        <div class="empty">
+          <p>😕 Aucune conférence ne correspond à vos critères de recherche.</p>
+          <button (click)="resetFiltres()">Réinitialiser les filtres</button>
+        </div>
+      }
 
     </div>
-
-    <!-- Aucun résultat -->
-    <div class="empty" *ngIf="conferencesFiltrees.length === 0">
-      <p>😕 Aucune conférence ne correspond à votre recherche.</p>
-      <button (click)="resetFiltres()">Réinitialiser les filtres</button>
-    </div>
-  </div>
+  }
 
 </section>

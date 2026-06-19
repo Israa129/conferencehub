@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Services\MongoLogService;
 
 class AuthController extends Controller
 {
@@ -31,6 +32,9 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // ✅ Log : nouvelle inscription
+        MongoLogService::activity('user_register', "Nouveau compte créé : {$user->prenom} {$user->nom}", 'User', $user->id);
+
         return response()->json([
             'user'  => $user,
             'token' => $token
@@ -48,12 +52,18 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            // ✅ Log : échec de connexion
+            MongoLogService::login($request->email, 'failed');
+
             throw ValidationException::withMessages([
                 'email' => ['Identifiants incorrects.'],
             ]);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // ✅ Log : connexion réussie (on passe $user explicitement)
+        MongoLogService::login($user->email, 'success', $user);
 
         return response()->json([
             'user'  => $user,

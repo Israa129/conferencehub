@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SessionConference extends Model
 {
-    protected $table = 'sessions_conference';
-
+    protected $table = 'session_conferences'; 
     protected $fillable = [
         'titre',
         'type',
@@ -17,13 +16,21 @@ class SessionConference extends Model
         'conference_id',
     ];
 
-    public function conference()
+    public function fill(array $attributes)
     {
-        return $this->belongsTo(Conference::class);
-    }
+        $mapped = [
+            'horaireDebut'  => 'horaire_debut',
+            'horaireFin'    => 'horaire_fin',
+            'conferenceId'  => 'conference_id',
+        ];
 
-    public function articles()
-    {
-        return $this->hasMany(Article::class, 'session_id');
+        foreach ($mapped as $camel => $snake) {
+            if (isset($attributes[$camel])) {
+                $attributes[$snake] = $attributes[$camel];
+                unset($attributes[$camel]);
+            }
+        }
+
+        return parent::fill($attributes);
     }
 }

@@ -1,35 +1,33 @@
 <div class="organisateur-shell">
 
-    <div class="page-header mb-4">
-      <h1>Tableau de bord</h1>
+  <div class="page-header mb-4">
+    <h1>Tableau de bord</h1>
+  </div>
+
+  @if (!loadingStats && stats) {
+    <div class="info-grid">
+      
+      <div class="info-cell conf-card conf-card-blue">
+        <div class="card-border"></div>
+        <div class="label">Conférences</div>
+        <div class="value">{{ stats.conferences }}</div>
+      </div>
+
+      <div class="info-cell conf-card conf-card-purple">
+        <div class="card-border"></div>
+        <div class="label">Sessions</div>
+        <div class="value">{{ stats.sessions }}</div>
+      </div>
+
+      <div class="info-cell conf-card conf-card-green">
+        <div class="card-border"></div>
+        <div class="label">Articles soumis</div>
+        <div class="value">{{ stats.articles }}</div>
+      </div>
+
     </div>
+  } 
 
-    <div class="kpi-grid mb-4">
-
-      <div class="card p-3">
-        <div class="kpi-value">{{ conferences.length }}</div>
-        <div class="kpi-label">Conférences</div>
-      </div>
-
-      <div class="card p-3">
-        <div class="kpi-value">{{ totalSessions }}</div>
-        <div class="kpi-label">Sessions</div>
-      </div>
-
-      <div class="card p-3">
-        <div class="kpi-value">{{ totalParticipants }}</div>
-        <div class="kpi-label">Participants</div>
-      </div>
-
-      <div class="card p-3">
-        <div class="kpi-value">{{ activeConferenceCount }}</div>
-        <div class="kpi-label">Actives</div>
-      </div>
-
-    </div>
-
-      <app-conference-list>
-      </app-conference-list>
-
+  <app-conference-list></app-conference-list>
 
 </div>
