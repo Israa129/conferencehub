@@ -1,45 +1,180 @@
-<div class="welcome-card">
-  <h2>Bienvenue, {{ user.nom }} 👋</h2>
-  <p>{{ user.date | date:'EEEE d MMMM yyyy' }}</p>
+<!-- Loading -->
+<div class="db-loading" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
 </div>
 
-<div class="alert-card">
-  <h4>Complétez votre profil</h4>
-  <p>Ajoutez votre institution et votre spécialité.</p>
-  <button routerLink="/participant/settings">Compléter</button>
+<!-- Erreur -->
+<div class="db-card db-erreur" *ngIf="erreur && !loading">
+  <p>Impossible de charger le dashboard. Vérifiez votre connexion.</p>
+  <button class="btn-primary" (click)="chargerDashboard()">Réessayer</button>
 </div>
 
-<div class="progress-card">
-  <h3>Votre parcours — ICIA 2025</h3>
-  <div class="steps">
-    <div class="step completed">Compte créé</div>
-    <div class="step completed">Inscription confirmée</div>
-    <div class="step completed">QR généré</div>
-    <div class="step">Attestation</div>
+<!-- Toast message partage -->
+<div class="toast" *ngIf="messagePartage" [class.toast-visible]="messagePartage">
+  {{ messagePartage }}
+</div>
+
+<!-- Contenu -->
+<div class="db-wrapper" *ngIf="!loading && !erreur">
+
+  <!-- Welcome -->
+  <div class="db-card welcome-card">
+    <div class="welcome-row">
+      <div>
+        <h2>Bienvenue, {{ user?.prenom }} 👋</h2>
+        <p>{{ today | date:'EEEE d MMMM yyyy' }}</p>
+      </div>
+      <div class="avatar">{{ user?.initiales }}</div>
+    </div>
+  </div>
+
+  <!-- Stats rapides -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-number">{{ inscriptions.length }}</div>
+    <div class="stat-label">📋 Conférences inscrites</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ inscriptionsConfirmees }}</div>
+    <div class="stat-label">✅ Confirmées</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ prochainEvenement ? '1' : '0' }}</div>
+    <div class="stat-label">📅 À venir</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ attestationsDisponibles }}</div>
+    <div class="stat-label">📜 Attestations</div>
   </div>
 </div>
 
-<div class="cards-row">
-  <div class="card">
-    <h3>Mon QR Code</h3>
-    <div class="fake-qr">QR CODE</div>
-    <span class="badge">Actif</span>
-    <button routerLink="/participant/qr-code">Voir mon QR</button>
+  <!-- Alerte profil incomplet -->
+  <div class="db-card alert-card" *ngIf="user && !user.profilComplet">
+    <div class="alert-left">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <h4>Complétez votre profil pour débloquer toutes les fonctionnalités</h4>
+        <p>Ajoutez votre institution et votre spécialité (2 étapes restantes)</p>
+        <div class="profile-bar">
+          <div class="profile-bar-fill" [style.width]="user.profilPct + '%'"></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" [routerLink]="['/participant/settings']">Compléter →</button>
   </div>
 
-  <div class="card">
-    <h3>Mes inscriptions</h3>
-   <div
-  class="registration"
-  *ngFor="let conf of conferences">
-
-  <strong>{{ conf.title }}</strong>
-
-  <span class="badge confirmed">
-    Disponible
-  </span>
-
-</div>
-    <button routerLink="/participant/my-registrations">Voir tout</button>
+  <!-- Stepper parcours -->
+  <div class="db-card" *ngIf="inscription">
+    <div class="section-title">Votre parcours — {{ inscription?.conference?.nom }}</div>
+    <div class="section-sub">
+      {{ inscription?.conference?.description }} · {{ inscription?.conference?.lieu }}, {{ inscription?.conference?.dates }}
+    </div>
+    <div class="stepper">
+      <ng-container *ngFor="let step of steps; let i = index; let last = last">
+        <div class="step-item">
+          <div class="step-circle" [class.done]="step.done" [class.active]="step.active">
+            <span *ngIf="step.done">✓</span>
+            <span *ngIf="!step.done">📄</span>
+          </div>
+          <div class="step-label">{{ step.label }}</div>
+          <div class="step-date">{{ step.date }}</div>
+        </div>
+        <div class="step-line" *ngIf="!last" [class.inactive]="!steps[i+1].done && !steps[i+1].active"></div>
+      </ng-container>
+    </div>
+    <div class="info-box">
+      ℹ️ Votre attestation sera disponible
+      <strong>48h après la fin de la conférence</strong>,
+      sous réserve de votre présence enregistrée par QR Code.
+    </div>
   </div>
+
+  <!-- Cards row -->
+  <div class="cards-row">
+
+    <!-- QR Code -->
+    <div class="db-card">
+      <div class="card-header">
+        <span class="card-title">Mon QR Code de présence</span>
+        <span class="badge badge-actif">Actif</span>
+      </div>
+      <p class="card-sub">{{ inscription?.conference?.nom }} — {{ inscription?.conference?.ville }}</p>
+      <div class="qr-placeholder">
+        <img *ngIf="qrCodeUrl" [src]="qrCodeUrl" alt="QR Code de présence" />
+        <div *ngIf="!qrCodeUrl" class="qr-mock">QR</div>
+      </div>
+      <p class="qr-id">ID PARTICIPANT — {{ user?.participantId }}</p>
+      <div class="qr-meta">
+        <div>
+          <small>Événement</small>
+          <strong>{{ inscription?.conference?.nom }}</strong>
+        </div>
+        <div>
+          <small>Statut</small>
+          <strong class="text-success">Confirmé ✓</strong>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn-primary" (click)="telechargerQR()">
+          ⬇ Télécharger
+        </button>
+        <button
+          class="btn-outline"
+          (click)="partagerQR()"
+          [disabled]="partageEnCours"
+          [class.btn-loading]="partageEnCours">
+          <span *ngIf="!partageEnCours">↗ Partager</span>
+          <span *ngIf="partageEnCours">...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Inscriptions -->
+    <div class="db-card">
+      <div class="card-header">
+        <span class="card-title">Mes inscriptions ({{ inscriptions.length }})</span>
+        <a (click)="voirToutInscriptions()" class="link" style="cursor:pointer">Voir tout →</a>
+      </div>
+      <div class="reg-item" *ngFor="let ins of inscriptions">
+        <div>
+          <div class="reg-name">{{ ins.conference?.nom }}</div>
+          <div class="reg-sub">{{ ins.conference?.dates }} · {{ ins.conference?.ville }}</div>
+        </div>
+        <span class="badge"
+          [class.badge-conf]="ins.statut === 'confirmé'"
+          [class.badge-pend]="ins.statut === 'en_attente'">
+          {{ ins.statut === 'confirmé' ? 'Confirmé' : 'En attente' }}
+        </span>
+      </div>
+      <button class="btn-outline btn-full" [routerLink]="['/participant/conferences']">
+        + S'inscrire à une nouvelle conférence
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Countdown prochain événement -->
+  <div class="countdown-card" *ngIf="prochainEvenement">
+    <div>
+      <small class="event-label">Prochain événement</small>
+      <h3>{{ prochainEvenement.nom }} — {{ prochainEvenement.ville }}</h3>
+      <p>{{ prochainEvenement.description }}</p>
+      <small>📍 {{ prochainEvenement.adresse }}</small>
+      <div class="btn-group" style="margin-top:12px">
+        <button class="btn-ghost" (click)="voirProgramme()">
+          📋 Voir le programme
+        </button>
+        <button class="btn-ghost" (click)="ajouterAgenda()">
+          📅 Ajouter à mon agenda
+        </button>
+      </div>
+    </div>
+    <div class="countdown-nums">
+      <div class="cnum"><span>{{ countdown.jours }}</span><small>jours</small></div>
+      <div class="cnum"><span>{{ countdown.heures }}</span><small>heures</small></div>
+      <div class="cnum"><span>{{ countdown.minutes }}</span><small>min</small></div>
+    </div>
+  </div>
+
 </div>

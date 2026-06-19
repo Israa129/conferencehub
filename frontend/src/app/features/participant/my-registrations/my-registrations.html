@@ -1,25 +1,72 @@
-<p>my-registrations works!</p>
-<div class="page-header">
-  <h2>Mes inscriptions</h2>
-  <p>Retrouvez toutes vos conférences enregistrées.</p>
+<!-- Loading -->
+<div class="loading-state" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
 </div>
 
-<div class="registration-card"
-     *ngFor="let registration of registrations">
+<!-- Erreur -->
+<div class="error-state" *ngIf="erreur && !loading">
+  <p>Impossible de charger vos inscriptions.</p>
+  <button class="btn-primary" (click)="charger()">Réessayer</button>
+</div>
 
-  <h3>{{ registration.title }}</h3>
+<!-- Contenu -->
+<div class="page-wrapper" *ngIf="!loading && !erreur">
 
-  <p>
-    📍 {{ registration.location }}
-  </p>
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <button class="btn-back" (click)="retourDashboard()">← Tableau de bord</button>
+      <h1>Mes inscriptions</h1>
+      <p>{{ inscriptions.length }} conférence{{ inscriptions.length > 1 ? 's' : '' }} enregistrée{{ inscriptions.length > 1 ? 's' : '' }}</p>
+    </div>
+    <button class="btn-primary" (click)="voirConferences()">
+      + S'inscrire à une nouvelle conférence
+    </button>
+  </div>
 
-  <span
-    class="badge"
-    [class.confirmed]="registration.status === 'Confirmée'"
-    [class.pending]="registration.status === 'En attente'">
+  <!-- Vide -->
+  <div class="empty-state" *ngIf="inscriptions.length === 0">
+    <div class="empty-icon">📋</div>
+    <h3>Aucune inscription</h3>
+    <p>Vous n'êtes inscrit à aucune conférence pour le moment.</p>
+    <button class="btn-primary" (click)="voirConferences()">
+      Parcourir les conférences
+    </button>
+  </div>
 
-    {{ registration.status }}
+  <!-- Liste -->
+  <div class="inscriptions-list" *ngIf="inscriptions.length > 0">
+    <div class="inscription-card" *ngFor="let ins of inscriptions">
 
-  </span>
+      <div class="card-left">
+        <div class="card-icon">🎓</div>
+      </div>
+
+      <div class="card-body">
+        <div class="card-header">
+          <h3>{{ ins.conference?.nom }}</h3>
+          <span class="badge"
+            [class.badge-conf]="ins.statut === 'confirmé'"
+            [class.badge-pend]="ins.statut === 'en_attente'">
+            {{ ins.statut === 'confirmé' ? 'Confirmé ✓' : 'En attente' }}
+          </span>
+        </div>
+
+        <div class="card-meta">
+          <span>📍 {{ ins.conference?.lieu }}</span>
+          <span>📅 {{ ins.conference?.dates }}</span>
+          <span>🗓 Inscrit le {{ ins.date_inscription }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-outline" (click)="voirConference(ins.conference?.id)">
+          Voir la conférence →
+        </button>
+      </div>
+
+    </div>
+  </div>
 
 </div>

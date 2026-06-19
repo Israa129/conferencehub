@@ -11,7 +11,6 @@ import { ConferenceList } from './features/conferences/conference-list/conferenc
 import { Dashboard } from './features/participant/dashboard/dashboard';
 import { QrCode } from './features/participant/qr-code/qr-code';
 import { Certificates } from './features/participant/certificates/certificates';
-import { Settings } from './features/participant/settings/settings';
 
 import { OrganisateurDashboard } from './features/organisateur/organisateur-dashboard/organisateur-dashboard';
 import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
@@ -47,12 +46,6 @@ export const routes: Routes = [
   {
     path: 'participant/certificates',
     component: Certificates
-  },
-
-
-  {
-    path: 'participant/settings',
-    component: Settings
   },
 
   {

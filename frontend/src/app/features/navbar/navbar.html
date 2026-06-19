@@ -26,6 +26,47 @@
   <!-- CONNECTÉ -->
   <div class="nav-user" *ngIf="userState.isLoggedIn() && !isAuthPage">
 
+    <!-- 🔔 Cloche notifications (participant uniquement) -->
+    <div class="notif-wrapper" *ngIf="userState.user()?.role === 'participant'">
+      <button class="notif-btn" (click)="toggleNotif()">
+        🔔
+        <span class="notif-badge" *ngIf="nbNonLues > 0">{{ nbNonLues }}</span>
+      </button>
+
+      <!-- Dropdown notifications -->
+      <div class="notif-dropdown" *ngIf="notifOuverte">
+        <div class="notif-header">
+          <span class="notif-title">Notifications</span>
+          <span class="notif-count">{{ nbNonLues }} nouvelle{{ nbNonLues > 1 ? 's' : '' }}</span>
+        </div>
+
+        <!-- Vide -->
+        <div class="notif-empty" *ngIf="notifications.length === 0">
+          <p>Aucune notification</p>
+        </div>
+
+        <!-- Liste -->
+        <div class="notif-list" *ngIf="notifications.length > 0">
+          <div class="notif-item" *ngFor="let n of notifications"
+            [class.notif-success]="n.type === 'success'"
+            [class.notif-info]="n.type === 'info'"
+            [class.notif-warning]="n.type === 'warning'">
+            <div class="notif-icon">{{ n.icon }}</div>
+            <div class="notif-content">
+              <div class="notif-item-titre">{{ n.titre }}</div>
+              <div class="notif-item-msg">{{ n.message }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="notif-footer" *ngIf="notifications.length > 0">
+          <a routerLink="/participant/dashboard" (click)="notifOuverte = false">
+            Voir le tableau de bord →
+          </a>
+        </div>
+      </div>
+    </div>
+
     <!-- Lien rapide selon rôle -->
     <ng-container [ngSwitch]="userState.user()?.role">
       <a *ngSwitchCase="'participant'"  routerLink="/participant/dashboard"  routerLinkActive="active">Mon espace</a>

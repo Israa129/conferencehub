@@ -1,7 +1,8 @@
 <div class="page-header">
   <div>
     <h1>Conférences</h1>
-    <p>Parcourez et gérez toutes les conférences</p>
+    <p *ngIf="!isParticipant">Parcourez et gérez toutes les conférences</p>
+    <p *ngIf="isParticipant">Parcourez et inscrivez-vous aux conférences</p>
   </div>
   <div class="header-actions">
     <div class="search-bar">
@@ -12,7 +13,8 @@
         [(ngModel)]="searchQuery"
       />
     </div>
-    <a routerLink="/conferences/new" class="btn btn-primary">
+    <!-- Bouton visible uniquement pour non-participants -->
+    <a *ngIf="!isParticipant" routerLink="/conferences/new" class="btn btn-primary">
       <span class="material-icons">add</span>
       Nouvelle conférence
     </a>
@@ -31,7 +33,7 @@
     <div class="empty-state">
       <span class="material-icons empty-icon">mic</span>
       <p>Aucune conférence trouvée.</p>
-      <a routerLink="/conferences/new" class="btn btn-primary mt-4">
+      <a *ngIf="!isParticipant" routerLink="/conferences/new" class="btn btn-primary mt-4">
         Créer la première
       </a>
     </div>
@@ -85,14 +87,27 @@
                 </td>
                 <td>
                   <div class="table-actions justify-end">
-                    <button (click)="onEdit(conf)" class="btn btn-outline btn-sm">
-                      <span class="material-icons">edit</span>
-                      Modifier
-                    </button>
-                    <button (click)="onDelete(conf.id)" class="btn btn-danger btn-sm">
-                      <span class="material-icons">delete</span>
-                      Suppr.
-                    </button>
+
+                    <!-- Bouton participant : S'inscrire -->
+                    @if (isParticipant) {
+                      <button (click)="sInscrire(conf)" class="btn btn-primary btn-sm">
+                        <span class="material-icons">how_to_reg</span>
+                        S'inscrire
+                      </button>
+                    }
+
+                    <!-- Boutons admin/organisateur -->
+                    @if (!isParticipant) {
+                      <button (click)="onEdit(conf)" class="btn btn-outline btn-sm">
+                        <span class="material-icons">edit</span>
+                        Modifier
+                      </button>
+                      <button (click)="onDelete(conf.id)" class="btn btn-danger btn-sm">
+                        <span class="material-icons">delete</span>
+                        Suppr.
+                      </button>
+                    }
+
                   </div>
                 </td>
               </tr>

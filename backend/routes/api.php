@@ -3,11 +3,12 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConferenceController;
-use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SessionConferenceController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ParticipantController;
 
 // ── Test ────────────────────────────────────────
 Route::get('/test', function () {
@@ -25,7 +26,7 @@ Route::post('/reset-password',  [PasswordResetController::class, 'resetPassword'
 
 // ── Publiques ───────────────────────────────────
 Route::apiResource('conferences', ConferenceController::class);
-Route::apiResource('sessions',    SessionController::class);
+Route::apiResource('sessions', SessionConferenceController::class);
 
 // ── Auth protégées ──────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
@@ -37,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me',      [AuthController::class, 'me']);
 
-    // Conférencier
+    // ── Conférencier ────────────────────────────
     Route::prefix('conferencier')->group(function () {
         Route::get('/stats',                  [ArticleController::class, 'stats']);
         Route::get('/articles',               [ArticleController::class, 'index']);
@@ -48,7 +49,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/articles/{id}/download', [ArticleController::class, 'download']);
     });
 
-    Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    // ── Participant ─────────────────────────────
+    Route::prefix('participant')->group(function () {
+        Route::get('/dashboard',          [ParticipantController::class, 'dashboard']);
+        Route::get('/qr-code',            [ParticipantController::class, 'qrCode']);
+        Route::get('/inscriptions',       [ParticipantController::class, 'inscriptions']);
+        Route::get('/inscriptions/{id}',  [ParticipantController::class, 'inscription']);
+    });
+
+    // ── Admin ───────────────────────────────────
+    Route::prefix('admin')->group(function () {
         Route::get('/stats',                    [AdminController::class, 'stats']);
         Route::get('/utilisateurs',             [AdminController::class, 'utilisateurs']);
         Route::put('/utilisateurs/{id}/role',   [AdminController::class, 'updateRole']);
