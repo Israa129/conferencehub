@@ -34,4 +34,8 @@ export class ConferenceService {
   search(q: string): Observable<Conference[]> {
     return this.http.get<Conference[]>(`${this.baseUrl}?search=${encodeURIComponent(q)}`);
   }
+
+  getByOrganisateur(organisateurId: number): Observable<Conference[]> {
+    return this.http.get<Conference[]>(`${this.baseUrl}/organisateur/${organisateurId}`);
+  }
 }

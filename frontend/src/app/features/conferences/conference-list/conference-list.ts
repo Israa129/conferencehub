@@ -28,16 +28,41 @@ export class ConferenceList implements OnInit {
   }
 
   loadConferences(): void {
-    this.conferenceService.getAll().subscribe({
-      next: (data) => {
-        this.conferences.set(data);
-        this.loaded.set(true);
-      },
+  const userString = localStorage.getItem('user');
+
+  let role: string | null = null;
+  let userId: number | null = null;
+  if (userString) {
+    try {
+      const userObj = JSON.parse(userString);
+      role = userObj.role; 
+      userId = userObj.id;
+    } catch (e) {
+      console.error("Erreur lors du parsing de l'objet utilisateur", e);
+    }
+  }
+
+  if (role === 'organisateur' && userId) {
+    this.conferenceService.getByOrganisateur(userId).subscribe({
+      next: (data) => this.handleSuccess(data),
       error: (err) => {
         console.error(err);
         this.loaded.set(true);
       }
     });
+  } else {
+    this.conferenceService.getAll().subscribe({
+      next: (data) => this.handleSuccess(data),
+      error: (err) => {
+        console.error(err);
+        this.loaded.set(true);
+      }
+    });
+  }
+}
+  private handleSuccess(data: Conference[]): void {
+    this.conferences.set(data);
+    this.loaded.set(true);
   }
 
   get filteredConferences(): Conference[] {

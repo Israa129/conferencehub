@@ -77,4 +77,11 @@ export class ArticleService {
       { statut, commentaires }
     );
   }
+  getArticlesByOrganisateur(statut?: string, conferenceId?: number): Observable<ArticlesResponse> {
+    let params = new HttpParams();
+    if (statut && statut !== 'tous') params = params.set('statut', statut);
+    if (conferenceId) params = params.set('conference_id', conferenceId);
+    
+    return this.http.get<ArticlesResponse>(`${this.api}/articles-organisateur`, { params });
+  }
 }

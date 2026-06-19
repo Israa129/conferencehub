@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SessionConference extends Model
 {
-    protected $table = 'sessions_conference';
+    protected $table = 'session_conferences'; 
+
     protected $fillable = [
         'titre',
         'type',
@@ -15,6 +17,12 @@ class SessionConference extends Model
         'capacite',
         'conference_id',
     ];
+
+
+    public function conference(): BelongsTo
+    {
+        return $this->belongsTo(Conference::class, 'conference_id');
+    }
 
     public function fill(array $attributes)
     {

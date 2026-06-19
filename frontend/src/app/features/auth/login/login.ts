@@ -29,10 +29,9 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // ✅ Message si on vient de s'inscrire
     this.route.queryParams.subscribe(params => {
       if (params['registered'] === 'success') {
-        this.succes = '✅ Compte créé avec succès ! Connectez-vous.';
+        this.succes = 'Compte créé avec succès ! Connectez-vous.';
       }
     });
   }
@@ -43,12 +42,11 @@ export class LoginComponent implements OnInit {
     this.auth.login(this.form).subscribe({
       next: (res: any) => {
         this.auth.saveToken(res.token, res.user);
-        // ✅ Redirection selon le rôle
         const role = res.user.role;
         if (role === 'admin') {
           this.router.navigate(['/admin/dashboard']);
         } else if (role === 'organisateur') {
-          this.router.navigate(['/organisateur']);
+          this.router.navigate(['/organisateur/dashboard']);
         } else if (role === 'conferencier') {
           this.router.navigate(['/conferencier/dashboard']);
         } else {
