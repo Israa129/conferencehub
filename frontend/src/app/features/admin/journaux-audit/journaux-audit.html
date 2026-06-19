@@ -1,0 +1,89 @@
+<div class="audit-page">
+  <div class="page-header">
+    <div>
+      <h1>Journaux d'audit</h1>
+      <p>Historique détaillé des actions réalisées sur la plateforme.</p>
+    </div>
+  </div>
+
+  <div class="filters-card">
+    <input
+      type="text"
+      placeholder="Rechercher utilisateur ou description..."
+      [(ngModel)]="search"
+      (keyup.enter)="loadLogs(1)"
+    />
+
+    <select [(ngModel)]="role" (change)="loadLogs(1)">
+      <option value="">Tous les rôles</option>
+      <option value="admin">Administrateur</option>
+      <option value="organisateur">Organisateur</option>
+      <option value="conferencier">Conférencier</option>
+      <option value="participant">Participant</option>
+    </select>
+
+    <select [(ngModel)]="action" (change)="loadLogs(1)">
+      <option value="">Toutes les actions</option>
+      <option *ngFor="let a of actions" [value]="a">{{ a }}</option>
+    </select>
+
+    <button class="btn-primary" (click)="loadLogs(1)">Filtrer</button>
+    <button class="btn-secondary" (click)="resetFilters()">Réinitialiser</button>
+  </div>
+
+  <div class="table-card">
+    <div class="loading" *ngIf="loading">⏳ Chargement des journaux...</div>
+
+    <table *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Rôle</th>
+          <th>Action</th>
+          <th>Description</th>
+          <th>Adresse IP</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let log of logs">
+          <td>
+            <strong>{{ log.user_name || 'Utilisateur inconnu' }}</strong>
+            <span>{{ log.user_email || '—' }}</span>
+          </td>
+
+          <td>
+            <span class="badge role">{{ log.role || '—' }}</span>
+          </td>
+
+          <td>
+            <span class="badge action">{{ log.action || '—' }}</span>
+          </td>
+
+          <td>{{ log.description || '—' }}</td>
+          <td>{{ log.ip_address || '—' }}</td>
+          <td>{{ log.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+
+        <tr *ngIf="logs.length === 0">
+          <td colspan="6" class="empty">
+            Aucun journal trouvé.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination" *ngIf="!loading && total > 0">
+      <button (click)="previousPage()" [disabled]="currentPage === 1">
+        Précédent
+      </button>
+
+      <span>Page {{ currentPage }} / {{ lastPage }} — {{ total }} résultat(s)</span>
+
+      <button (click)="nextPage()" [disabled]="currentPage === lastPage">
+        Suivant
+      </button>
+    </div>
+  </div>
+</div>

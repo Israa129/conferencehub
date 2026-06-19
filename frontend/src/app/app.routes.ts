@@ -20,6 +20,7 @@ import { ValidationArticle } from './features/organisateur/validation-article/va
 import { ListArticle } from './features/organisateur/list-article/list-article';
 import { AdminUtilisateurs } from './features/admin/admin-utilisateurs/admin-utilisateurs';
 import { Analytics } from './features/admin/analytics/analytics';
+import { JournauxAudit } from './features/admin/journaux-audit/journaux-audit';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -53,7 +54,7 @@ export const routes: Routes = [
   { path: 'admin/conferences', component: AdminDashboardComponent },
   { path: 'admin/roles', component: AdminDashboardComponent },
   { path: 'admin/analytics', component: Analytics },
-  { path: 'admin/logs', component: AdminDashboardComponent },
+  { path: 'admin/logs', component: JournauxAudit },
   { path: 'admin/parametres', component: AdminDashboardComponent },
   { path: 'admin/mailing', component: AdminDashboardComponent },
   { path: 'admin/create-user', component: RegisterComponent },

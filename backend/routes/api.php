@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\AuditLogController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -39,6 +40,8 @@ Route::prefix('admin')->group(function () {
     Route::put('/utilisateurs/{id}/statut', [AdminController::class, 'toggleStatut']);
     Route::delete('/utilisateurs/{id}',     [AdminController::class, 'deleteUser']);
     Route::get('/analytics',                [AnalyticsController::class, 'index']);
+    Route::get('/audit-logs', [AuditLogController::class, 'index']);
+    Route::get('/audit-logs/actions', [AuditLogController::class, 'actions']);
 });
 
     Route::get('/profile',          [ProfileController::class, 'show']);
