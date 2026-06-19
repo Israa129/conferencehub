@@ -250,4 +250,35 @@ class ArticleController extends Controller
             'data'    => $article,
         ]);
     }
+
+    public function byOrganisateur(Request $request): JsonResponse
+    {
+        $filters = [];
+
+        if ($request->has('conference_id')) {
+            $filters['conference_id'] = $request->conference_id;
+        }
+        
+        if ($request->has('statut') && $request->statut !== 'tous') {
+            $filters['statut'] = $request->statut;
+        }
+
+        $articles = $this->articleService->list($filters);
+
+        $stats = [
+            'total'          => $articles->count(),
+            'en_revision'    => $articles->where('statut', 'en_revision')->count(),
+            'accepte'        => $articles->where('statut', 'accepte')->count(),
+            'refuse'         => $articles->where('statut', 'refuse')->count(),
+            'par_conference' => $articles->groupBy('conference_nom')
+                ->map(fn($g) => $g->count())
+                ->toArray(),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data'    => $articles->values(),
+            'stats'   => $stats,
+        ]);
+    }
 }

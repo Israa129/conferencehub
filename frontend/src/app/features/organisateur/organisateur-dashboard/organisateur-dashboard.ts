@@ -1,11 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 👈 1. Importe ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Conference } from '../../../core/models/Conference';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
 import { ConferenceList } from '../../conferences/conference-list/conference-list';
 import { DashboardOrganisateurService } from '../../../core/services/organisateur/dashboard-organisateur';
-import { ListArticle } from '../list-article/list-article';
 
 @Component({
   selector: 'app-organisateur-dashboard',
@@ -22,8 +21,6 @@ export class OrganisateurDashboard implements OnInit {
   stats: any = null;
   loadingStats = false;
 
-  organisateurId = 1;
-
   constructor(
     private conferenceService: ConferenceService, 
     private dashboardService: DashboardOrganisateurService,
@@ -31,28 +28,50 @@ export class OrganisateurDashboard implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.load();
-    this.loadStats();
+    const userId = this.getOrganisateurId();
+
+    if (userId) {
+      this.load(userId);
+      this.loadStats(userId);
+    } else {
+      console.error("Aucun identifiant d'organisateur trouvé dans le stockage local.");
+    }
   }
 
-  load(): void {
+  private getOrganisateurId(): number | null {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      try {
+        const userObj = JSON.parse(userString);
+        return userObj.id ? Number(userObj.id) : null;
+      } catch (e) {
+        console.error("Erreur lors du parsing de l'objet utilisateur", e);
+      }
+    }
+    return null;
+  }
+
+  load(userId: number): void {
     this.loading = true;
-    this.conferenceService.getAll().subscribe({
+    
+    this.conferenceService.getByOrganisateur(userId).subscribe({
       next: (data) => {
         this.conferences = data;
         this.loading = false;
         this.cdr.detectChanges(); 
       },
-      error: () => {
+      error: (err) => {
+        console.error('Erreur conférences:', err);
         this.loading = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  loadStats(): void {
+  loadStats(userId: number): void {
     this.loadingStats = true;
-    this.dashboardService.getStats().subscribe({
+    
+    this.dashboardService.getStats(userId).subscribe({
       next: (res) => {
         console.log('Données reçues du backend :', res);
         if (res && res.success) {
@@ -68,8 +87,6 @@ export class OrganisateurDashboard implements OnInit {
       }
     });
   }
-
-
 
   isActive(conf: Conference): boolean {
     const now = new Date();

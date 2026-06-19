@@ -61,7 +61,6 @@ export const routes: Routes = [
   { path: 'conferences/new', component: ConferenceFormulaire },
   { path: 'conferences/:id/edit', component: ConferenceFormulaire },
   { path: 'conferences/:id', component: ConferenceDetails },
-  { path: 'sessions/new', component: ConferenceFormulaire },
 
   {
     path: 'conferencier',
@@ -74,6 +73,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
+
+  { path: 'sessions/new', component: ConferenceFormulaire },
 
   { path: '**', redirectTo: '' }
 ];

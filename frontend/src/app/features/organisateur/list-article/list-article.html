@@ -1,26 +1,36 @@
 <div class="validation-container">
-  
+
   <div class="liste-section">
     <h2>Articles reçus</h2>
+
     <div class="liste-group">
-      @for (art of articles(); track art._id) {
-        <div class="article-item" 
-             [class.active]="articleSelectionne()?._id === art._id"
-             (click)="selectionner(art)">
-          <h4>{{ art.titre }}</h4>
-          <p class="meta">Par : {{ art.conferencier_nom }}</p>
-          <span class="badge" [ngClass]="'badge-' + art.statut">
-            {{ art.statut }}
-          </span>
-        </div>
-      } @empty {
-        <p>Aucun article à afficher.</p>
+
+      @if (articlesNonValides().length > 0) {
+
+        @for (art of articlesNonValides(); track art._id) {
+          <div class="article-item"
+               [class.active]="articleSelectionne()?._id === art._id"
+               (click)="selectionner(art)">
+
+            <h4>{{ art.titre }}</h4>
+            <p class="meta">Par : {{ art.conferencier_nom }}</p>
+
+            <span class="badge" [ngClass]="'badge-' + art.statut">
+              {{ art.statut }}
+            </span>
+
+          </div>
+        }
+
+      } @else {
+        <p>Aucun article non validé.</p>
       }
+
     </div>
   </div>
 
   <div class="details-section">
-    <app-validation-article 
+    <app-validation-article
       [article]="articleSelectionne()"
       (articleMisAJour)="onArticleMisAJour($event)">
     </app-validation-article>
