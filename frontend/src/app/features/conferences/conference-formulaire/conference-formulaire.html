@@ -1,14 +1,12 @@
-<span class="back-link" routerLink="/conferences">← Retour aux conférences</span>
-
 <div class="form-page">
   <div class="page-header">
     <div>
-      @if (isEdit) {
-        <h1>Modifier la conférence</h1>
-        <p>Mettez à jour les informations.</p>
+      @if (isSessionOnly) {
+        <h1>Ajouter une session</h1>
+      } @else if (isEdit) {
+        <h1>Modifier la conference</h1>
       } @else {
-        <h1>Nouvelle conférence</h1>
-        <p>Remplissez les détails de votre conférence.</p>
+        <h1>Nouvelle conference</h1>
       }
     </div>
   </div>
@@ -16,16 +14,6 @@
   <div class="form-card">
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
-      <div class="form-group">
-        <label>Titre *</label>
-        <input type="text" formControlName="titre" placeholder="Ex : DevFest 2025" />
-
-<<<<<<< Updated upstream
-        @if (f['titre'].touched && f['titre'].errors?.['required']) {
-          <small style="color:var(--danger);font-size:12px;">
-            Le titre est requis.
-          </small>
-=======
           @if (f['titre'].touched && f['titre'].errors?.['required']) {
             <small class="error-text">Le titre est requis.</small>
           }
@@ -62,47 +50,121 @@
 
         @if (!isEdit) {
           <hr class="form-separator" />
->>>>>>> Stashed changes
         }
       </div>
-
-      <div class="form-group">
-        <label>Description *</label>
-        <textarea formControlName="description" placeholder="Décrivez la conférence..."></textarea>
-      </div>
-
-      <div class="form-row">
+      @if (!isSessionOnly) {
         <div class="form-group">
-          <label>Thème *</label>
-          <input type="text" formControlName="theme" placeholder="Ex : Intelligence Artificielle" />
+          <label>Titre de la conference *</label>
+          <input type="text" formControlName="titre" placeholder="Ex : DevFest 2025" />
+
+          @if (f['titre'].touched && f['titre'].errors?.['required']) {
+            <small class="error-text">Le titre est requis.</small>
+          }
         </div>
 
         <div class="form-group">
-          <label>Lieu *</label>
-          <input type="text" formControlName="lieu" placeholder="Ex : Paris, France" />
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Date de début *</label>
-          <input type="date" formControlName="date_debut" />
+          <label>Description *</label>
+          <textarea formControlName="description" placeholder="Decrivez la conference..."></textarea>
         </div>
 
-        <div class="form-group">
-          <label>Date de fin *</label>
-          <input type="date" formControlName="date_fin" />
-        </div>
-      </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Theme *</label>
+            <input type="text" formControlName="theme" placeholder="Ex : Intelligence Artificielle" />
+          </div>
 
-      <div class="form-group">
-        <label>ID Organisateur *</label>
-        <input type="number" formControlName="organisateur_id" placeholder="ID de l'utilisateur organisateur" />
-      </div>
+          <div class="form-group">
+            <label>Lieu *</label>
+            <input type="text" formControlName="lieu" placeholder="Ex : Paris, France" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date de debut *</label>
+            <input type="date" formControlName="date_debut" />
+          </div>
+
+          <div class="form-group">
+            <label>Date de fin *</label>
+            <input type="date" formControlName="date_fin" />
+          </div>
+        </div>
+
+        @if (!isEdit) {
+          <hr class="form-separator" />
+        }
+      }
+
+      @if (!isEdit) {
+        <div class="sessions-header-box">
+          <h3>{{ isSessionOnly ? 'Session' : 'Programme & Sessions' }}</h3>
+          @if (!isSessionOnly) {
+            <button type="button" class="btn btn-outline btn-sm" (click)="addSession()">
+              <span class="material-icons">add</span> Ajouter une session
+            </button>
+          }
+        </div>
+
+        <div formArrayName="sessions" class="sessions-list">
+          @for (sessionCtrl of sessions.controls; track $index) {
+            <div [formGroupName]="$index" class="session-nested-card">
+
+              <div class="session-card-header">
+                <h4>Session n°{{ $index + 1 }}</h4>
+                @if (!isSessionOnly) {
+                  <button type="button" class="btn-remove-session" (click)="removeSession($index)">
+                    <span class="material-icons">delete</span>
+                  </button>
+                }
+              </div>
+
+              <div class="form-group">
+                <label>Titre de la session *</label>
+                <input type="text" formControlName="titre" placeholder="Ex : Introduction au Deep Learning" />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Type *</label>
+                  <select formControlName="type">
+                    <option value="">Selectionner un type</option>
+                    <option value="Keynote">Keynote</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Panel">Table ronde</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Capacite max *</label>
+                  <input type="number" formControlName="capacite" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Horaire de debut *</label>
+                  <input type="datetime-local" formControlName="horaireDebut" />
+                </div>
+
+                <div class="form-group">
+                  <label>Horaire de fin *</label>
+                  <input type="datetime-local" formControlName="horaireFin" />
+                </div>
+              </div>
+
+            </div>
+          }
+
+          @if (sessions.length === 0) {
+            <p class="no-session-hint">Aucune session programmee pour l'instant. Vous pourrez en ajouter plus tard.</p>
+          }
+        </div>
+      }
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">
-          {{ isEdit ? 'Enregistrer les modifications' : 'Créer la conférence' }}
+          {{ isSessionOnly ? 'Ajouter la session' : (isEdit ? 'Enregistrer les modifications' : 'Creer la conference et ses sessions') }}
         </button>
       </div>
 

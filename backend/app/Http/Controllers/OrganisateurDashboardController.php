@@ -2,38 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Conference;
-use App\Models\SessionConference;
-use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use App\Models\Conference;
+use App\Models\Article;
+use App\Models\SessionConference;
 
 class OrganisateurDashboardController extends Controller
 {
-    public function getDashboardStats(int $organisateur_id): JsonResponse
+    public function getDashboardStats(): JsonResponse
     {
         try {
-            // 1. Compte uniquement les conférences de cet organisateur
-            $totalConferences = Conference::where('organisateur_id', $organisateur_id)->count();
-
-            // 2. Compte uniquement les sessions de cet organisateur via la relation propre
-            $totalSessions = SessionConference::whereHas('conference', function ($query) use ($organisateur_id) {
-                $query->where('organisateur_id', $organisateur_id);
-            })->count();
+            $totalConferences = Conference::count();
+            $totalSessions    = SessionConference::count();
+            // $totalArticles    = Article::count();
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'conferences' => $totalConferences,
                     'sessions'    => $totalSessions,
+                    // 'articles'    => $totalArticles
                 ]
             ], 200);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Erreur au chargement du tableau de bord', [
-                'organisateur_id' => $organisateur_id,
-                'message'         => $e->getMessage(),
-                'trace'           => $e->getTraceAsString()
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString()
             ]);
 
             return response()->json([

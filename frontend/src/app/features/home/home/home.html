@@ -1,0 +1,124 @@
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    {{ conferences().length }} conférences scientifiques répertoriées
+  </div>
+
+  <h1>
+    Découvrez les grandes<br>
+    <span class="highlight">conférences scientifiques</span>
+  </h1>
+
+  <p class="hero-sub">
+    Inscriptions, événements et opportunités de recherche académique —<br>
+    le tout centralisé sur une seule plateforme.
+  </p>
+
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input
+      [(ngModel)]="recherche"
+      placeholder="Rechercher une conférence, un domaine, un lieu..."
+    />
+    <button>Rechercher</button>
+  </div>
+
+  <div class="tendances">
+    <span>Tendances :</span>
+    <button
+      *ngFor="let t of tendances"
+      (click)="filtreTheme = (filtreTheme === t ? '' : t)"
+      [class.active]="filtreTheme === t"
+    >{{ t }}</button>
+  </div>
+</section>
+
+<section class="conferences-section">
+
+  <div class="section-header">
+    <div>
+      <h2>Conférences disponibles</h2>
+      @if (isLoaded()) {
+        <p class="results-count">
+          <strong>{{ conferencesFiltrees.length }} résultats</strong>
+          <span *ngIf="filtreTheme"> dans <span class="tag-blue">{{ filtreTheme }}</span></span>
+        </p>
+      }
+    </div>
+
+    <div class="filtres">
+      <span *ngIf="filtreTheme" class="tag-filter">
+        {{ filtreTheme }}
+        <button (click)="filtreTheme = ''">✕</button>
+      </span>
+
+      <span *ngIf="filtreStatut" class="tag-filter">
+        {{ filtreStatut === 'ouvert' ? 'En cours / Clôturées' : 'À venir' }}
+        <button (click)="filtreStatut = ''">✕</button>
+      </span>
+
+      <select [(ngModel)]="tri" class="select-tri">
+        <option value="recent">Les plus récentes</option>
+        <option value="ancien">Chronologique inverse</option>
+      </select>
+
+      <select [(ngModel)]="filtreStatut" class="select-tri">
+        <option value="">Tous les statuts</option>
+        <option value="ouvert">Débutées / Passées</option>
+        <option value="bientot">À venir</option>
+      </select>
+    </div>
+  </div>
+
+  @if (isLoaded()) {
+    <div class="conference-list">
+      
+      @for (c of conferencesFiltrees; track c.id) {
+        <div class="conference-card">
+          <div class="card-body">
+            
+            <div class="card-tags">
+              <span class="tag-theme">🏷️ {{ c.theme }}</span>
+              
+              @switch (getBadgeStatus(c)) {
+                @case ('avenir') {
+                  <span class="badge badge-blue">À venir</span>
+                }
+                @case ('active') {
+                  <span class="badge badge-success">En cours</span>
+                }
+                @case ('termine') {
+                  <span class="badge badge-gray">Terminée</span>
+                }
+              }
+            </div>
+
+            <h3>{{ c.titre }}</h3>
+            <p class="organisateur">{{ c.description }}</p>
+
+            <div class="card-meta">
+              <span>📅 {{ c.date_debut | date:'dd MMM yyyy' }} – {{ c.date_fin | date:'dd MMM yyyy' }}</span>
+              <span>📍 {{ c.lieu }}</span>
+            </div>
+
+          </div>
+
+          <div class="card-action">
+            <button class="btn-voir" [routerLink]="['/conferences', c.id]">
+              Voir les détails
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (conferencesFiltrees.length === 0) {
+        <div class="empty">
+          <p>😕 Aucune conférence ne correspond à vos critères de recherche.</p>
+          <button (click)="resetFiltres()">Réinitialiser les filtres</button>
+        </div>
+      }
+
+    </div>
+  }
+
+</section>

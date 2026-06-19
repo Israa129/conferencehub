@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-
+@import "bootstrap/dist/css/bootstrap.min.css";
 * {
   box-sizing: border-box;
   margin: 0;
@@ -272,6 +272,16 @@ a {
     transform: translateY(-50%);
     font-size: 13px;
   }
+}
+.app-layout {
+  display: flex;
+  width: 100%;
+}
+.app-main-content {
+  flex: 1; 
+  overflow-y: auto;
+  background: #f4f3ef;
+  padding: 2rem 1.5rem;
 }
 
 /* Responsive */

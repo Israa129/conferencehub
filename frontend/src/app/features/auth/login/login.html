@@ -1,19 +1,117 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <h2>🎓 ConférenceHub</h2>
-    <h3>Se connecter</h3>
+<main class="auth-page">
+  <section class="auth-hero">
+    <div class="brand">
 
-    <div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+    </div>
 
-    <form (ngSubmit)="onSubmit()">
-      <input [(ngModel)]="form.email" name="email" type="email" placeholder="Email" required />
-      <input [(ngModel)]="form.password" name="password" type="password" placeholder="Mot de passe" required />
+    <div class="hero-content">
+      <h1>
+        La plateforme de reference pour les
+        <span>conferences scientifiques</span>
+      </h1>
+      <p>
+        Rejoignez une communaute internationale de chercheurs, scientifiques
+        et professionnels academiques.
+      </p>
+    </div>
 
-      <button type="submit" [disabled]="chargement">
-        {{ chargement ? 'Connexion...' : 'Se connecter' }}
-      </button>
-    </form>
+    <ul class="features">
+      <li>
+        <span class="feature-icon success">✓</span>
+        <div>
+          <strong>Inscription & QR Code automatique</strong>
+          <small>Votre badge de presence genere instantanement</small>
+        </div>
+      </li>
+      <li>
+        <span class="feature-icon blue">▣</span>
+        <div>
+          <strong>Soumission d'articles simplifiee</strong>
+          <small>Formulaire guide en 4 etapes avec suivi du statut</small>
+        </div>
+      </li>
+      <li>
+        <span class="feature-icon purple">◇</span>
+        <div>
+          <strong>Attestation PDF officielle</strong>
+          <small>Telechargeable depuis votre espace personnel</small>
+        </div>
+      </li>
+      <li>
+        <span class="feature-icon amber">♚</span>
+        <div>
+          <strong>Gestion complete des conferences</strong>
+          <small>Outils de planification et suivi des participants</small>
+        </div>
+      </li>
+    </ul>
+  </section>
 
-    <p>Pas de compte ? <a routerLink="/register">S'inscrire</a></p>
-  </div>
-</div>
+  <section class="auth-panel">
+    <div class="auth-card">
+
+      <header>
+        <h2>Bienvenue !</h2>
+        <p>Connectez-vous a votre espace personnel</p>
+      </header>
+
+      <div *ngIf="erreur" class="alert">{{ erreur }}</div>
+      <div *ngIf="succes" class="succes">{{ succes }}</div>
+
+      <div class="oauth-grid">
+        <button type="button" class="oauth-btn">
+          <span class="google">G</span>
+          Google
+        </button>
+        <button type="button" class="oauth-btn">
+          <span class="orcid">iD</span>
+          ORCID
+        </button>
+      </div>
+
+      <div class="divider">
+        <span>ou avec votre email</span>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <label for="email">Adresse email <span>*</span></label>
+        <input
+          id="email"
+          [(ngModel)]="form.email"
+          name="email"
+          type="email"
+          placeholder="panawe.dayoka@utbm.fr"
+          required
+          email
+        />
+
+        <label for="password">Mot de passe <span>*</span></label>
+        <div class="password-field">
+          <input
+            id="password"
+            [(ngModel)]="form.password"
+            name="password"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Votre mot de passe"
+            required
+          />
+          <button type="button" (click)="showPassword = !showPassword">
+            {{ showPassword ? 'Masquer' : 'Voir' }}
+          </button>
+        </div>
+
+        <div class="form-row">
+          <label class="remember">
+            <input [(ngModel)]="form.remember" name="remember" type="checkbox" />
+            Se souvenir de moi
+          </label>
+          <a routerLink="/forgot-password">Mot de passe oublie ?</a>
+        </div>
+
+        <button class="submit-btn" type="submit" [disabled]="chargement || loginForm.invalid">
+          {{ chargement ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+    </div>
+  </section>
+</main>

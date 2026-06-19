@@ -6,7 +6,7 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class FileMetadata extends Model
 {
-    protected $connection = 'mongodb';
+    protected $connection = 'mongodb_logs';
     protected $collection = 'file_metadata';
 
     protected $fillable = [

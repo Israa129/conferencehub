@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 👈 1. Importe ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Conference } from '../../../core/models/Conference';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
 import { ConferenceList } from '../../conferences/conference-list/conference-list';
 import { DashboardOrganisateurService } from '../../../core/services/organisateur/dashboard-organisateur';
+import { ListArticle } from '../list-article/list-article';
 
 @Component({
   selector: 'app-organisateur-dashboard',
@@ -21,8 +22,7 @@ export class OrganisateurDashboard implements OnInit {
   stats: any = null;
   loadingStats = false;
 
-  userId: number | null = null;
-  userRole: string | null = null;
+  organisateurId = 1;
 
   constructor(
     private conferenceService: ConferenceService, 
@@ -31,32 +31,13 @@ export class OrganisateurDashboard implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.initUser();
-    this.loadConferences();
+    this.load();
     this.loadStats();
   }
 
-  private initUser(): void {
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      try {
-        const userObj = JSON.parse(userString);
-        this.userId = userObj.id;
-        this.userRole = userObj.role;
-      } catch (e) {
-        console.error("Error parsing user from localStorage", e);
-      }
-    }
-  }
-
-  loadConferences(): void {
+  load(): void {
     this.loading = true;
-
-    const fetch$ = (this.userRole === 'organisateur' && this.userId)
-      ? this.conferenceService.getByOrganisateur(this.userId)
-      : this.conferenceService.getAll();
-
-    fetch$.subscribe({
+    this.conferenceService.getAll().subscribe({
       next: (data) => {
         this.conferences = data;
         this.loading = false;
@@ -70,27 +51,25 @@ export class OrganisateurDashboard implements OnInit {
   }
 
   loadStats(): void {
-    if (!this.userId) {
-      this.cdr.detectChanges();
-      return;
-    }
-
     this.loadingStats = true;
-    this.dashboardService.getStats(this.userId).subscribe({
+    this.dashboardService.getStats().subscribe({
       next: (res) => {
-        if (res?.success) {
+        console.log('Données reçues du backend :', res);
+        if (res && res.success) {
           this.stats = res.data;
         }
         this.loadingStats = false;
         this.cdr.detectChanges(); 
       },
       error: (err) => {
-        console.error('Error fetching stats:', err);
+        console.error('Erreur stats:', err);
         this.loadingStats = false;
         this.cdr.detectChanges();  
       }
     });
   }
+
+
 
   isActive(conf: Conference): boolean {
     const now = new Date();

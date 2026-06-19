@@ -1,7 +1,53 @@
-<nav class="navbar">
-  <a class="navbar-brand" routerLink="/">ConferenceHub</a>
-  <div class="nav-links">
+<nav class="navbar" [class.navbar-auth]="isAuthPage">
+
+  <!-- Logo -->
+  <a class="navbar-brand" routerLink="/">
+    <div class="brand-icon">🏛️</div>
+    <div class="brand-text">
+      <span class="brand-name">ConferenceHub</span>
+      <span class="brand-sub" *ngIf="!isAuthPage">Plateforme académique</span>
+    </div>
+  </a>
+
+  <!-- Liens navigation publics -->
+  <div class="nav-links" *ngIf="!isAuthPage">
     <a routerLink="/conferences" routerLinkActive="active">Conférences</a>
-    <!-- <a routerLink="/sessions" routerLinkActive="active">Sessions</a> -->
+    <a routerLink="/appels" routerLinkActive="active">Appels à communications</a>
+    <a routerLink="/institutions" routerLinkActive="active">Institutions</a>
+    <a routerLink="/contact" routerLinkActive="active">Contact</a>
   </div>
+
+  <!-- NON connecté -->
+  <div class="nav-actions" *ngIf="!userState.isLoggedIn()">
+    <a routerLink="/login" class="btn-login">Se connecter</a>
+    <a routerLink="/register" class="btn-register">S'inscrire</a>
+  </div>
+
+  <!-- CONNECTÉ -->
+  <div class="nav-user" *ngIf="userState.isLoggedIn() && !isAuthPage">
+
+    <!-- Lien rapide selon rôle -->
+    <ng-container [ngSwitch]="userState.user()?.role">
+      <a *ngSwitchCase="'participant'"  routerLink="/participant/dashboard"  routerLinkActive="active">Mon espace</a>
+      <a *ngSwitchCase="'conferencier'" routerLink="/conferencier/dashboard" routerLinkActive="active">Mes articles</a>
+      <a *ngSwitchCase="'organisateur'" routerLink="/organisateur/dashboard" routerLinkActive="active">Mes conférences</a>
+      <a *ngSwitchCase="'admin'"        routerLink="/admin/dashboard"        routerLinkActive="active">Administration</a>
+    </ng-container>
+
+    <!-- Avatar + Dropdown -->
+    <div class="user-menu">
+      <div class="avatar">
+        {{ userState.user()?.prenom?.charAt(0) }}{{ userState.user()?.nom?.charAt(0) }}
+      </div>
+      <div class="dropdown">
+        <span class="user-name">{{ userState.user()?.prenom }} {{ userState.user()?.nom }}</span>
+        <span class="user-role-text">{{ userState.user()?.role | titlecase }}</span>
+        <hr />
+        <a routerLink="/profile" class="dropdown-item">👤 Mon profil</a>
+        <button (click)="logout()" class="dropdown-item logout">🚪 Déconnexion</button>
+      </div>
+    </div>
+
+  </div>
+
 </nav>

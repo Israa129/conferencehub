@@ -1,13 +1,16 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 import { Conference } from '../../../core/models/Conference';
 import { SessionConference } from '../../../core/models/SessionConference';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
 import { SessionService } from '../../../core/services/session/session-conference';
-import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-conference-details',
+  standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './conference-details.html',
   styleUrl: './conference-details.scss',
@@ -18,17 +21,26 @@ export class ConferenceDetails implements OnInit {
 
   loading = true;
   loadingSessions = false;
+  deletingSessionId?: number;
+  currentUser: any;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private conferenceService: ConferenceService,
     private sessionService: SessionService,
-      private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.currentUser = this.auth.getUser();
     const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    if (!id) {
+      this.router.navigate(['/conferences']);
+      return;
+    }
 
     this.loading = true;
 
@@ -36,8 +48,11 @@ export class ConferenceDetails implements OnInit {
       next: (conf) => {
         this.conference = conf;
         this.loading = false;
+
+        // Charger les sessions de la conférence
+        this.loadSessions(id);
+
         this.cdr.detectChanges();
-        // this.loadSessions(id);
       },
       error: (error) => {
         console.log(error);
@@ -46,38 +61,68 @@ export class ConferenceDetails implements OnInit {
     });
   }
 
-  // loadSessions(conferenceId: number): void {
-  //   this.loadingSessions = true;
+  loadSessions(conferenceId: number): void {
+    this.loadingSessions = true;
 
-  //   this.sessionService.getByConference(conferenceId).subscribe({
-  //     next: (s) => {
-  //       this.sessions = s;
-  //       this.loadingSessions = false;
-  //     },
-  //     error: (error) => {
-  //       console.log(error);
-  //       this.loadingSessions = false;
-  //     },
-  //   });
-  // }
+    this.sessionService.getByConference(conferenceId).subscribe({
+      next: (sessions) => {
+        this.sessions = sessions;
+        this.loadingSessions = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.log(error);
+        this.loadingSessions = false;
+      },
+    });
+  }
 
   delete(): void {
-    if (!this.conference || !confirm('Supprimer cette conférence ?')) return;
+    if (!this.conference || !confirm('Supprimer cette conférence ?')) {
+      return;
+    }
 
     this.conferenceService.delete(this.conference.id).subscribe({
-      next: () => this.router.navigate(['/conferences']),
-      error: (error) => console.log(error),
+      next: () => {
+        this.router.navigate(['/conferences']);
+      },
+      error: (error) => {
+        console.log(error);
+      },
     });
   }
 
   deleteSession(session: SessionConference): void {
-    if (!confirm(`Supprimer la session "${session.titre}" ?`)) return;
+    if (!confirm(`Supprimer la session "${session.titre}" ?`)) {
+      return;
+    }
+
+    this.deletingSessionId = session.id;
 
     this.sessionService.delete(session.id).subscribe({
       next: () => {
-        this.sessions = this.sessions.filter((s) => s.id !== session.id);
+        this.sessions = this.sessions.filter(
+          (s) => s.id !== session.id
+        );
+        this.deletingSessionId = undefined;
+        this.cdr.detectChanges();
       },
-      error: (error) => console.log(error),
+      error: (error) => {
+        console.log(error);
+        this.deletingSessionId = undefined;
+      },
     });
+  }
+
+  get organisateurName(): string {
+    if (
+      this.currentUser &&
+      this.conference &&
+      Number(this.currentUser.id) === Number(this.conference.organisateur_id)
+    ) {
+      return `${this.currentUser.prenom || ''} ${this.currentUser.nom || ''}`.trim();
+    }
+
+    return this.conference?.organisateur_id?.toString() || '';
   }
 }

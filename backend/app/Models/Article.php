@@ -2,25 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Article extends Model
 {
+    protected $connection = 'mongodb';
+    protected $collection = 'articles';
+
     protected $fillable = [
         'titre',
         'resume',
+        'mots_cles',
+        'fichier_pdf',
         'statut',
-        'user_id',
-        'session_id',
+        'commentaires',
+        'conference_id',
+        'conference_nom',
+        'conference_lieu',
+        'conferencier_id',
+        'conferencier_nom',
+        'session_assignee',
+        'date_presentation',
     ];
 
-    public function auteur()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function sessionConference()
-    {
-        return $this->belongsTo(SessionConference::class, 'session_id');
-    }
+    protected $casts = [
+        'mots_cles' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }

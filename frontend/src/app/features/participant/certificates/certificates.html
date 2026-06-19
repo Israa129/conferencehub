@@ -1,0 +1,20 @@
+<div class="page-header">
+  <h2>Mes attestations</h2>
+  <p>Téléchargez vos attestations de participation.</p>
+</div>
+
+<div
+  class="certificate-card"
+  *ngFor="let certificate of certificates">
+
+  <h3>{{ certificate.conference }}</h3>
+
+  <p>
+    📅 {{ certificate.date }}
+  </p>
+
+  <button>
+    Télécharger PDF
+  </button>
+
+</div>

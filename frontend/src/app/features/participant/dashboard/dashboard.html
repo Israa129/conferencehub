@@ -1,0 +1,42 @@
+<div class="welcome-card">
+  <h2>Bienvenue, {{ user.nom }} 👋</h2>
+  <p>{{ user.date | date:'EEEE d MMMM yyyy' }}</p>
+</div>
+
+<div class="alert-card">
+  <h4>Complétez votre profil</h4>
+  <p>Ajoutez votre institution et votre spécialité.</p>
+  <button routerLink="/participant/settings">Compléter</button>
+</div>
+
+<div class="progress-card">
+  <h3>Votre parcours — ICIA 2025</h3>
+  <div class="steps">
+    <div class="step completed">Compte créé</div>
+    <div class="step completed">Inscription confirmée</div>
+    <div class="step completed">QR généré</div>
+    <div class="step">Attestation</div>
+  </div>
+</div>
+
+<div class="cards-row">
+  <div class="card">
+    <h3>Mon QR Code</h3>
+    <div class="fake-qr">QR CODE</div>
+    <span class="badge">Actif</span>
+    <button routerLink="/participant/qr-code">Voir mon QR</button>
+  </div>
+
+  <div class="card">
+    <h3>Mes inscriptions</h3>
+    <div class="registration">
+      <strong>ICIA 2025</strong>
+      <span class="badge confirmed">Confirmée</span>
+    </div>
+    <div class="registration">
+      <strong>DataScience World Forum</strong>
+      <span class="badge pending">En attente</span>
+    </div>
+    <button routerLink="/participant/my-registrations">Voir tout</button>
+  </div>
+</div>

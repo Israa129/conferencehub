@@ -6,11 +6,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class DashboardOrganisateurService {
-  private apiUrl = 'http://127.0.0.1:8000/api/dashboard/stats';
+  private apiUrl = 'http://127.0.0.1:8000/api/organisateur/dashboard-stats';
 
   constructor(private http: HttpClient) {}
 
-  getStats(organisateurId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${organisateurId}`);
+  getStats(): Observable<any> {
+    return this.http.get<any>(this.apiUrl);
   }
 }

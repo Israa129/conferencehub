@@ -1,0 +1,129 @@
+<div class="admin-main">
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div>
+      <h1>Administration — Gestion des utilisateurs</h1>
+      <p>Vue globale de tous les comptes · {{ stats?.utilisateurs_total }} utilisateurs enregistrés</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary">⬇️ Exporter CSV</button>
+    </div>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="stats-grid" *ngIf="stats">
+    <div class="stat-card">
+      <div class="stat-icon blue">👥</div>
+      <div>
+        <span class="stat-plus green">+{{ stats.utilisateurs_mois }} ce mois</span>
+        <strong class="stat-number">{{ stats.utilisateurs_total }}</strong>
+        <span class="stat-label">Utilisateurs totaux</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">🎓</div>
+      <div>
+        <span class="stat-plus green">{{ stats.conferences_actives }} actives</span>
+        <strong class="stat-number">{{ stats.conferences_actives }}</strong>
+        <span class="stat-label">Conférences sur la plateforme</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">🚫</div>
+      <div>
+        <span class="stat-plus orange">À traiter</span>
+        <strong class="stat-number">{{ stats.comptes_bloques }}</strong>
+        <span class="stat-label">Comptes bloqués</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">📄</div>
+      <div>
+        <span class="stat-plus purple">{{ stats.articles_total }} publiés</span>
+        <strong class="stat-number">{{ stats.articles_total }}</strong>
+        <span class="stat-label">Articles soumis au total</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="table-card">
+    <div class="table-header">
+      <h2>Utilisateurs</h2>
+      <div class="table-filters">
+        <div class="search-box">
+          <span>🔍</span>
+          <input [(ngModel)]="search" (ngModelChange)="onSearch()"
+            placeholder="Rechercher un utilisateur..." />
+        </div>
+        <select [(ngModel)]="filtreRole" (ngModelChange)="loadUtilisateurs()">
+          <option value="">Tous les rôles</option>
+          <option value="participant">Participant</option>
+          <option value="conferencier">Conférencier</option>
+          <option value="organisateur">Organisateur</option>
+          <option value="admin">Admin</option>
+        </select>
+        <select [(ngModel)]="filtreStatut" (ngModelChange)="loadUtilisateurs()">
+          <option value="">Tous les statuts</option>
+          <option value="actif">Actif</option>
+          <option value="bloque">Bloqué</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="loading" *ngIf="chargement">⏳ Chargement...</div>
+
+    <table *ngIf="!chargement && utilisateurs.length > 0">
+      <thead>
+        <tr>
+          <th><input type="checkbox" /></th>
+          <th>UTILISATEUR</th>
+          <th>RÔLE</th>
+          <th>PAYS</th>
+          <th>STATUT</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of utilisateurs">
+          <td><input type="checkbox" /></td>
+          <td class="user-cell">
+            <div class="user-avatar">{{ getInitiales(user) }}</div>
+            <div>
+              <strong>{{ user.prenom }} {{ user.nom }}</strong>
+              <span>{{ user.email }}</span>
+            </div>
+          </td>
+          <td>
+            <select [(ngModel)]="user.role"
+              (ngModelChange)="updateRole(user, $event)"
+              [class]="'role-select role-' + user.role">
+              <option *ngFor="let r of roles" [value]="r">{{ r | titlecase }}</option>
+            </select>
+          </td>
+          <td>{{ user.pays || '—' }}</td>
+          <td>
+            <span class="statut-badge"
+              [class.actif]="user.statut !== 'bloque'"
+              [class.bloque]="user.statut === 'bloque'">
+              ● {{ user.statut === 'bloque' ? 'Bloqué' : 'Actif' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn-icon" title="Modifier">✏️</button>
+            <button class="btn-icon" (click)="toggleStatut(user)">
+              {{ user.statut === 'bloque' ? '🔓' : '🚫' }}
+            </button>
+            <button class="btn-icon danger" (click)="deleteUser(user)">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty" *ngIf="!chargement && utilisateurs.length === 0">
+      Aucun utilisateur trouvé.
+    </div>
+  </div>
+
+</div>

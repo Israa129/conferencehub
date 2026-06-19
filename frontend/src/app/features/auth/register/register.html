@@ -1,21 +1,90 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <h2>🎓 Créer un compte</h2>
+<div class="auth-wrapper">
+  <!-- Panneau gauche -->
+  <div class="left-panel">
 
-    <div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+    <div class="left-content">
+      <h1>Rejoignez la communauté des <span class="highlight">conférences scientifiques</span></h1>
+      <p>Créez votre compte et accédez à toutes les fonctionnalités de la plateforme.</p>
 
-    <form (ngSubmit)="onSubmit()">
-      <input [(ngModel)]="form.nom" name="nom" placeholder="Nom" required />
-      <input [(ngModel)]="form.prenom" name="prenom" placeholder="Prénom" required />
-      <input [(ngModel)]="form.email" name="email" type="email" placeholder="Email" required />
-      <input [(ngModel)]="form.password" name="password" type="password" placeholder="Mot de passe" required />
-      <input [(ngModel)]="form.pays" name="pays" placeholder="Pays" />
+      <div class="features">
+        <div class="feature">
+          <span class="icon">✅</span>
+          <div>
+            <strong>Inscription & QR Code automatique</strong>
+            <p>Votre badge de présence généré instantanément</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span class="icon">📄</span>
+          <div>
+            <strong>Soumission d'articles simplifiée</strong>
+            <p>Formulaire guidé avec suivi du statut</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span class="icon">🛡️</span>
+          <div>
+            <strong>Attestation PDF officielle</strong>
+            <p>Téléchargeable depuis votre espace personnel</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span class="icon">🎓</span>
+          <div>
+            <strong>Gestion complète des conférences</strong>
+            <p>Outils de planification et suivi des participants</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <button type="submit" [disabled]="chargement">
-        {{ chargement ? 'Inscription...' : 'S\'inscrire' }}
-      </button>
-    </form>
+  <!-- Panneau droit -->
+  <div class="right-panel">
+    
 
-    <p>Déjà un compte ? <a routerLink="/login">Se connecter</a></p>
+    <div class="form-container">
+      <h2>Créer un compte</h2>
+      <p class="subtitle">Rejoignez ConferenceHub dès aujourd'hui</p>
+
+      <div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="row-2">
+          <div class="field">
+            <label>Nom *</label>
+            <input [(ngModel)]="form.nom" name="nom" placeholder="Dupont" required />
+          </div>
+          <div class="field">
+            <label>Prénom *</label>
+            <input [(ngModel)]="form.prenom" name="prenom" placeholder="Jean" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Adresse email *</label>
+          <input [(ngModel)]="form.email" name="email" type="email" placeholder="jean.dupont@utbm.fr" required />
+        </div>
+
+        <div class="field">
+          <label>Mot de passe *</label>
+          <input [(ngModel)]="form.password" name="password" type="password" placeholder="••••••••••••" required />
+        </div>
+
+        <div class="field">
+          <label>Pays</label>
+          <input [(ngModel)]="form.pays" name="pays" placeholder="France" />
+        </div>
+
+        <button type="submit" [disabled]="chargement">
+          <span>🎓</span>
+          {{ chargement ? 'Création...' : 'Créer mon compte' }}
+        </button>
+      </form>
+
+      <p class="login-link">
+        Déjà un compte ? <a routerLink="/login">Se connecter</a>
+      </p>
+    </div>
   </div>
 </div>
