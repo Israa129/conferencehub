@@ -28,13 +28,6 @@ export class ConferenceList implements OnInit {
   }
 
   loadConferences(): void {
-<<<<<<< Updated upstream
-    this.conferenceService.getAll().subscribe({
-      next: (data) => {
-        this.conferences.set(data);
-        this.loaded.set(true);
-      },
-=======
   const userString = localStorage.getItem('user');
 
   let role: string | null = null;
@@ -52,7 +45,6 @@ export class ConferenceList implements OnInit {
   if (role === 'organisateur' && userId) {
     this.conferenceService.getByOrganisateur(userId).subscribe({
       next: (data) => this.handleSuccess(data),
->>>>>>> Stashed changes
       error: (err) => {
         console.error(err);
         this.loaded.set(true);
