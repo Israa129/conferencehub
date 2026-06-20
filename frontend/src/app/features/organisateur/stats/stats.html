@@ -1,0 +1,10 @@
+<div class="stats-container">
+  <h2>Statistique des Conferences</h2>
+  @if (loading) {
+    <p>Chargement des statistiques...</p>
+  }
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+  <canvas #myChart [hidden]="loading || !!errorMessage"></canvas>
+</div>

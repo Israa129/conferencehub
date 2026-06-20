@@ -80,3 +80,4 @@ Route::prefix('conferencier')->group(function () {
     Route::get('/articles/{id}/download', [ArticleController::class, 'download']);
 });
 Route::get('/users/{id}/name', [AuthController::class, 'getNameById']);
+Route::get('/organisateur/dashboard-stats/logs/{organisateur_id}', [ConferenceController::class, 'statsParOrganisateur']);

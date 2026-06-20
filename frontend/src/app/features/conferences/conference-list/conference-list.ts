@@ -33,6 +33,10 @@ export class ConferenceList implements OnInit {
    public getRole(): boolean {
     return this.auth.getUser()?.role == 'conferencier' || this.auth.getUser()?.role == 'organisateur'||this.auth.getUser()?.role == 'admin';
   }
+
+  public isParticipant(): boolean {
+    return this.auth.getUser()?.role == 'participant'
+  }
   
 
   ngOnInit(): void {

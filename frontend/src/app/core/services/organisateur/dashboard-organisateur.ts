@@ -15,4 +15,9 @@ export class DashboardOrganisateurService {
 
     return this.http.get<any>(this.apiUrl, { params });
   }
+  getStatsParOrganisateur(organisateurId: number): Observable<{ crees: number; modifiees: number; supprimees: number }> {
+    return this.http.get<{ crees: number; modifiees: number; supprimees: number }>(
+      `${this.apiUrl}/logs/${organisateurId}`
+    );
+  }
 }

@@ -26,6 +26,7 @@ import { SettingsSecurity } from './features/settings/settings-security/settings
 import { SettingsNotifications } from './features/settings/settings-notifications/settings-notifications';
 import { SettingsDisplay } from './features/settings/settings-display/settings-display';
 import { SettingsPrivacy } from './features/settings/settings-privacy/settings-privacy';
+import { Stats } from './features/organisateur/stats/stats';
 
 
 export const routes: Routes = [
@@ -52,6 +53,8 @@ export const routes: Routes = [
   { path: 'organisateur/conferences', component: ConferenceList },
   { path: 'organisateur/validation-articles', component: ValidationArticle },
   { path: 'organisateur/list-articles', component: ListArticle },
+  { path: 'organisateur/stats', component: Stats },
+
 
 
   { path: 'admin/dashboard', component: AdminDashboardComponent },

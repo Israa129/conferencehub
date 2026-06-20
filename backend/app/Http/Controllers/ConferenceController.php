@@ -93,4 +93,24 @@ class ConferenceController extends Controller
         
         return response()->json($conferences);
     }
+
+    public function statsParOrganisateur($organisateur_id)
+    {
+        $crees = Conference::where('organisateur_id', $organisateur_id)->count();
+
+        $modifiees = Conference::where('organisateur_id', $organisateur_id)
+            ->whereColumn('updated_at', '>', 'created_at')
+            ->count();
+
+        Log::info('Statistiques conférences récupérées', [
+            'organisateur_id' => $organisateur_id,
+            'crees'           => $crees,
+            'modifiees'       => $modifiees,
+        ]);
+
+        return response()->json([
+            'crees'     => $crees,
+            'modifiees' => $modifiees,
+        ]);
+    }
 }
