@@ -51,16 +51,16 @@
     <!-- ORGANISATEUR -->
     <ng-container *ngIf="userState.user()?.role === 'organisateur'">
       <a class="nav-item" routerLink="/organisateur/dashboard" routerLinkActive="active">
-        <span>🏠</span> Tableau de bord
+        Tableau de bord
       </a>
       <a class="nav-item" routerLink="/organisateur/conferences" routerLinkActive="active">
-        <span>🎓</span> Mes conférences
+        Mes conférences
       </a>
       <a class="nav-item" routerLink="/organisateur/list-articles" routerLinkActive="active">
-        <span>📄</span> Articles à valider
+        Articles à valider
       </a>
       <a class="nav-item" routerLink="/organisateur/stats" routerLinkActive="active">
-        <span>📄</span> statistique
+        statistique
       </a>
     </ng-container>
 
