@@ -2,7 +2,7 @@
   <div>
     <h1>Conférences</h1>
     <p *ngIf="getRole()" >Parcourez et gérez toutes les conférences</p>
-    <p *ngIf="getRole()" >Parcourez et inscrivez-vous aux conférences</p>
+    <p *ngIf="isParticipant()" >Parcourez et inscrivez-vous aux conférences</p>
   </div>
   <div class="header-actions">
     <div class="search-bar">

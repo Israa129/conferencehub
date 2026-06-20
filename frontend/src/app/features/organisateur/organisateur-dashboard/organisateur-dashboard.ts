@@ -92,4 +92,6 @@ export class OrganisateurDashboard implements OnInit {
     const now = new Date();
     return new Date(conf.date_debut) <= now && now <= new Date(conf.date_fin);
   }
+
+  
 }
