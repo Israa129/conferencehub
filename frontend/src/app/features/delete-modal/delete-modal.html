@@ -1,0 +1,30 @@
+@if (isOpen) {
+  <div class="modal-overlay" (click)="onCancel()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header">
+        <span class="material-icons warning-icon">warning</span>
+        <h3>{{ title }}</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>{{ message }}</p>
+        @if (itemName) {
+          <div class="target-item-box">
+            « <strong>{{ itemName }}</strong> »
+          </div>
+        }
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="onCancel()">
+          Annuler
+        </button>
+        <button type="button" class="btn-delete" (click)="onConfirm()">
+          Supprimer définitivement
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

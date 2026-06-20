@@ -93,14 +93,14 @@
                       <span class="material-icons">visibility</span>
                       Voir
                     </a>
-                    <button (click)="onEdit(conf)" class="btn btn-outline btn-sm">
+                    <button (click)="onEdit(conf)" class="btn btn-outline btn-sm" *ngIf="!isParticipant">
                       <span class="material-icons">edit</span>
                       Modifier
                     </button>
-                    <button (click)="onDelete(conf.id)" class="btn btn-danger btn-sm">
-                      <span class="material-icons">delete</span>
-                      Suppr.
-                    </button>
+                    <button (click)="onDelete(conf)" class="btn btn-danger btn-sm" *ngIf="!isParticipant">
+  <span class="material-icons">delete</span>
+  Suppr.
+</button>
                   </div>
                 </td>
               </tr>
@@ -111,3 +111,13 @@
     </div>
   }
 }
+
+ <app-delete-modal
+  [isOpen]="isDeleteModalOpen()"
+  [itemName]="conferenceToDelete()?.titre ?? ''"
+  message="Êtes-vous sûr de vouloir supprimer cette conférence ? Cette action est irréversible."
+  (confirm)="onConfirmDelete()"
+  (cancel)="onCancelDelete()"
+/>
+
+

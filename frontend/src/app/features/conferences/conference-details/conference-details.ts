@@ -49,7 +49,6 @@ export class ConferenceDetails implements OnInit {
         this.conference = conf;
         this.loading = false;
 
-        // Charger les sessions de la conférence
         this.loadSessions(id);
 
         this.cdr.detectChanges();
@@ -59,6 +58,10 @@ export class ConferenceDetails implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+   get isParticipant(): boolean {
+    return this.auth.getUser()?.role === 'participant';
   }
 
   loadSessions(conferenceId: number): void {

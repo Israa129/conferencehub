@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, AfterViewInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -20,6 +20,12 @@ interface SessionOption {
   label: string;
 }
 
+interface ConferenceOption {
+  id: number;
+  titre: string;
+  lieu?: string;
+}
+
 const API_BASE = 'http://127.0.0.1:8000/api';
 
 @Component({
@@ -29,7 +35,7 @@ const API_BASE = 'http://127.0.0.1:8000/api';
   templateUrl: './conferencier-dashboard.html',
   styleUrl: './conferencier-dashboard.scss'
 })
-export class ConferencierDashboard implements OnInit {
+export class ConferencierDashboard implements OnInit, AfterViewInit {
 
   articles = signal<Article[]>([]);
   stats = signal<ArticleStats>({ total: 0, en_revision: 0, accepte: 0, refuse: 0, par_conference: {} });
@@ -56,8 +62,11 @@ export class ConferencierDashboard implements OnInit {
   showNotifications = signal(false);
   sessionsConference = signal<SessionOption[]>([]);
   loadingSessions = signal(false);
+  conferencesPostgre = signal<ConferenceOption[]>([]);
+  triConference = signal<'az' | 'za'>('az');
 
   articleForm: FormGroup;
+  private chart: any = null;
 
   constructor(
     private articleService: ArticleService,
@@ -68,13 +77,16 @@ export class ConferencierDashboard implements OnInit {
     public userState: UserStateService
   ) {
     this.articleForm = this.fb.group({
-      titre:            ['', [Validators.required, Validators.maxLength(255)]],
-      resume:           ['', [Validators.required, Validators.maxLength(2000)]],
-      mots_cles:        ['', Validators.required],
-      conference_id:    ['', Validators.required],
-      conference_nom:   ['', Validators.required],
-      conference_lieu:  [''],
-      session_assignee: [''],
+      titre:         ['', [Validators.required, Validators.maxLength(255)]],
+      resume:        ['', [Validators.required, Validators.maxLength(2000)]],
+      mots_cles:     ['', Validators.required],
+      conference_id: ['', Validators.required],
+      session_id:    [''],
+    });
+
+    effect(() => {
+      const s = this.stats();
+      this.updateChart(s.en_revision, s.accepte, s.refuse);
     });
   }
 
@@ -93,17 +105,18 @@ export class ConferencierDashboard implements OnInit {
   ngOnInit(): void {
     this.mode.set((this.route.snapshot.data['mode'] as any) ?? 'dashboard');
     this.chargerArticles();
+    this.chargerConferencesPostgre();
 
     if (this.mode() === 'soumettre') {
       setTimeout(() => this.ouvrirModal());
     }
 
     this.articleForm.get('conference_id')?.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged())
+      .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((id: string) => {
         this.selectedConferenceId.set(id ?? '');
         if (id) {
-          this.chargerInfoConference(id, true);
+          this.chargerInfoConference(id, false);
           this.chargerSessions(id);
         } else {
           this.sessionsConference.set([]);
@@ -111,7 +124,41 @@ export class ConferencierDashboard implements OnInit {
       });
   }
 
-  // ── Chargement articles ───────────────────────────────
+  ngAfterViewInit(): void {
+    this.initChart();
+  }
+
+  private initChart(): void {
+    const canvas = document.getElementById('donutStatuts') as HTMLCanvasElement | null;
+    const Chart = (window as any).Chart;
+    if (!canvas || Chart === undefined) {
+      setTimeout(() => this.initChart(), 200);
+      return;
+    }
+    const s = this.stats();
+    this.chart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['En révision', 'Acceptés', 'Refusés'],
+        datasets: [{ data: [s.en_revision, s.accepte, s.refuse], backgroundColor: ['#f97316', '#22c55e', '#f43f5e'], borderWidth: 0 }]
+      },
+      options: { responsive: false, cutout: '70%', plugins: { legend: { display: false } } }
+    });
+  }
+
+  private updateChart(r: number, a: number, f: number): void {
+    if (!this.chart) return;
+    this.chart.data.datasets[0].data = [r, a, f];
+    this.chart.update();
+  }
+
+  private chargerConferencesPostgre(): void {
+    this.http.get<any>(`${API_BASE}/conferences`).subscribe({
+      next: (res) => { this.conferencesPostgre.set(res?.data ?? res ?? []); },
+      error: () => {}
+    });
+  }
+
   chargerArticles(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -121,14 +168,13 @@ export class ConferencierDashboard implements OnInit {
         this.stats.set(res.stats);
         this.loading.set(false);
         this.checkNotifications(res.data);
-        const ids = new Set(res.data.map(a => a.conference_id));
-        ids.forEach(id => this.chargerInfoConference(id, false));
+        const ids = new Set(res.data.map((a: Article) => a.conference_id));
+        ids.forEach((id: any) => this.chargerInfoConference(String(id), false));
       },
       error: () => { this.error.set('Erreur lors du chargement.'); this.loading.set(false); }
     });
   }
 
-  // ── Conférence (dates, lieu, titre) ───────────────────
   private chargerInfoConference(id: string, autoFillForm: boolean): void {
     if (!id) return;
     this.http.get<any>(`${API_BASE}/conferences/${id}`).subscribe({
@@ -136,28 +182,13 @@ export class ConferencierDashboard implements OnInit {
         const c = res?.data ?? res;
         this.conferenceInfo.update(map => ({
           ...map,
-          [id]: {
-            id,
-            titre: c?.titre,
-            lieu: c?.lieu,
-            date_debut: c?.date_debut,
-            date_fin: c?.date_fin,
-          }
+          [id]: { id, titre: c?.titre, lieu: c?.lieu, date_debut: c?.date_debut, date_fin: c?.date_fin }
         }));
-        if (autoFillForm) {
-          if (!this.articleForm.get('conference_nom')?.value) {
-            this.articleForm.patchValue({ conference_nom: c?.titre ?? '' }, { emitEvent: false });
-          }
-          if (!this.articleForm.get('conference_lieu')?.value) {
-            this.articleForm.patchValue({ conference_lieu: c?.lieu ?? '' }, { emitEvent: false });
-          }
-        }
       },
-      error: () => { /* conférence introuvable : ignoré */ }
+      error: () => {}
     });
   }
 
-  // ── Sessions de la conférence sélectionnée ────────────
   private chargerSessions(conferenceId: string): void {
     this.loadingSessions.set(true);
     this.sessionsConference.set([]);
@@ -166,10 +197,7 @@ export class ConferencierDashboard implements OnInit {
         const list: any[] = res?.data ?? res ?? [];
         const filtered = list
           .filter(s => String(s.conference_id) === String(conferenceId))
-          .map(s => ({
-            id: String(s.id),
-            label: s.titre ?? s.nom ?? s.intitule ?? `Session ${s.id}`,
-          }));
+          .map(s => ({ id: String(s.id), label: s.titre ?? s.nom ?? `Session ${s.id}` }));
         this.sessionsConference.set(filtered);
         this.loadingSessions.set(false);
       },
@@ -177,13 +205,9 @@ export class ConferencierDashboard implements OnInit {
     });
   }
 
-  // ── Computed ───────────────────────────────────────────
   articlesFiltres = computed(() => {
     let list = this.articles();
-
-    if (this.mode() === 'archives') {
-      list = list.filter(a => a.statut !== 'en_revision');
-    }
+    if (this.mode() === 'archives') list = list.filter(a => a.statut !== 'en_revision');
     if (this.filtreStatut() !== 'tous') list = list.filter(a => a.statut === this.filtreStatut());
     if (this.filtreConference() !== 'toutes') list = list.filter(a => a.conference_id === this.filtreConference());
     return list;
@@ -198,26 +222,25 @@ export class ConferencierDashboard implements OnInit {
         result.push({ id: a.conference_id, nom: a.conference_nom });
       }
     }
-    return result;
+    const sorted = result.sort((a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }));
+    return this.triConference() === 'za' ? [...sorted].reverse() : sorted;
   });
 
   articleAccepte = computed(() => this.articles().find(a => a.statut === 'accepte') ?? null);
 
-  // ── Modal soumission ────────────────────────────────────
   ouvrirModal(article?: Article): void {
     this.selectedFile = null;
     this.sessionsConference.set([]);
     if (article) {
       this.editingArticle.set(article);
       this.articleForm.patchValue({
-        titre: article.titre,
-        resume: article.resume,
-        mots_cles: article.mots_cles.join(', '),
+        titre:         article.titre,
+        resume:        article.resume,
+        mots_cles:     article.mots_cles.join(', '),
         conference_id: article.conference_id,
-        conference_nom: article.conference_nom,
-        conference_lieu: article.conference_lieu,
-        session_assignee: article.session_assignee ?? '',
+        session_id:    '',
       });
+      if (article.conference_id) this.chargerSessions(article.conference_id);
     } else {
       this.editingArticle.set(null);
       this.articleForm.reset();
@@ -231,10 +254,7 @@ export class ConferencierDashboard implements OnInit {
     this.articleForm.reset();
     this.selectedFile = null;
     this.sessionsConference.set([]);
-
-    if (this.mode() === 'soumettre') {
-      this.router.navigate(['/conferencier/dashboard']);
-    }
+    if (this.mode() === 'soumettre') this.router.navigate(['/conferencier/dashboard']);
   }
 
   onFileDrop(event: DragEvent): void {
@@ -263,10 +283,8 @@ export class ConferencierDashboard implements OnInit {
 
     fd.append('titre', v.titre);
     fd.append('resume', v.resume);
-    fd.append('conference_id', v.conference_id);
-    fd.append('conference_nom', v.conference_nom ?? '');
-    fd.append('conference_lieu', v.conference_lieu ?? '');
-    fd.append('session_assignee', v.session_assignee ?? '');
+    fd.append('conference_id', String(v.conference_id));
+    if (v.session_id) fd.append('session_id', String(v.session_id));
     fd.append('conferencier_id', String(u.id ?? ''));
     fd.append('conferencier_nom', u.nom);
 
@@ -275,7 +293,10 @@ export class ConferencierDashboard implements OnInit {
 
     if (this.selectedFile) fd.append('fichier_pdf', this.selectedFile);
 
-    const obs$ = editing ? this.articleService.modifier(editing._id, fd) : this.articleService.soumettre(fd);
+    const obs$ = editing
+      ? this.articleService.modifier(editing._id, fd)
+      : this.articleService.soumettre(fd);
+
     obs$.subscribe({
       next: (res) => {
         this.successMsg.set(res.message);
@@ -284,15 +305,15 @@ export class ConferencierDashboard implements OnInit {
         this.chargerArticles();
         setTimeout(() => this.successMsg.set(null), 4000);
       },
-      error: () => { this.error.set('Erreur lors de la soumission.'); this.loadingSubmit.set(false); }
+      error: (err) => {
+        const msg = err?.error?.message ?? 'Erreur lors de la soumission.';
+        this.error.set(msg);
+        this.loadingSubmit.set(false);
+      }
     });
   }
 
-  // ── Suppression ─────────────────────────────────────────
-  confirmerSuppression(article: Article): void {
-    this.articleToDelete.set(article);
-    this.showDeleteConfirm.set(true);
-  }
+  confirmerSuppression(article: Article): void { this.articleToDelete.set(article); this.showDeleteConfirm.set(true); }
 
   supprimerArticle(): void {
     const article = this.articleToDelete();
@@ -309,7 +330,6 @@ export class ConferencierDashboard implements OnInit {
     });
   }
 
-  // ── Détail / téléchargement ─────────────────────────────
   voirDetail(article: Article): void { this.selectedArticle.set(article); this.showDetailPanel.set(true); }
   fermerDetail(): void { this.showDetailPanel.set(false); this.selectedArticle.set(null); }
 
@@ -322,12 +342,10 @@ export class ConferencierDashboard implements OnInit {
     });
   }
 
-  // ── Notifications (changement de statut) ────────────────
   private checkNotifications(newArticles: Article[]): void {
     const key = 'conferencier_statuts_' + (this.user.id ?? 'anon');
     const stored = JSON.parse(localStorage.getItem(key) ?? '{}') as Record<string, string>;
     const notifs: { titre: string; statut: string }[] = [];
-
     newArticles.forEach(a => {
       const previous = stored[a._id];
       if (previous && previous !== a.statut && (a.statut === 'accepte' || a.statut === 'refuse')) {
@@ -335,7 +353,6 @@ export class ConferencierDashboard implements OnInit {
       }
       stored[a._id] = a.statut;
     });
-
     localStorage.setItem(key, JSON.stringify(stored));
     if (notifs.length > 0) this.notifications.set(notifs);
   }
@@ -343,9 +360,9 @@ export class ConferencierDashboard implements OnInit {
   toggleNotifications(): void { this.showNotifications.update(v => !v); }
   clearNotifications(): void { this.notifications.set([]); this.showNotifications.set(false); }
 
-  // ── Filtres / helpers ────────────────────────────────────
   setFiltreStatut(statut: string): void { this.filtreStatut.set(statut); }
   setFiltreConference(id: string): void { this.filtreConference.set(id); }
+  setTriConference(tri: 'az' | 'za'): void { this.triConference.set(tri); }
 
   statutLabel(statut: string): string {
     const labels: Record<string, string> = { en_revision: 'En révision', accepte: 'Accepté', refuse: 'Refusé' };
@@ -360,6 +377,13 @@ export class ConferencierDashboard implements OnInit {
   conferenceDates(conferenceId: string): { debut?: string; fin?: string } {
     const info = this.conferenceInfo()[conferenceId];
     return { debut: info?.date_debut, fin: info?.date_fin };
+  }
+
+  conferenceLabel(conferenceId: string): string {
+    const info = this.conferenceInfo()[conferenceId];
+    if (info?.titre) return info.titre;
+    const found = this.conferencesPostgre().find(c => String(c.id) === String(conferenceId));
+    return found?.titre ?? conferenceId;
   }
 
   trackById(_: number, item: Article): string { return item._id; }
