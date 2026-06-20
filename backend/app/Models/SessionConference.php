@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SessionConference extends Model
 {
-    protected $table = 'session_conferences'; 
+    protected $table = 'sessions_conference';
 
     protected $fillable = [
         'titre',
