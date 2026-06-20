@@ -83,4 +83,18 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    public function getNameById($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur introuvable'], 404);
+        }
+
+        return response()->json([
+            'id'   => $user->id,
+            'name' => $user->getName(),
+        ]);
+    }
 }

@@ -81,4 +81,9 @@ class User extends Authenticatable
     {
         return $this->role === 'participant';
     }
+
+    public function getName()
+    {
+        return $this->prenom . ' ' . $this->nom;
+    }
 }

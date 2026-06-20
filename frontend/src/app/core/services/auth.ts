@@ -36,6 +36,9 @@ export class AuthService {
     return user ? JSON.parse(user) : null;
   }
 
+  getNameById(id: number) {
+    return this.http.get<{ id: number; name: string }>(`${this.baseUrl}/users/${id}/name`);
+  }
   isLoggedIn() {
     return !!this.getToken();
   }
