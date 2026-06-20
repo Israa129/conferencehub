@@ -77,8 +77,8 @@ export class ConferenceDetails implements OnInit {
     });
   }
 
-   get isParticipant(): boolean {
-    return this.auth.getUser()?.role === 'participant';
+  public getRole(): boolean {
+    return this.auth.getUser()?.role == 'conferencier' || this.auth.getUser()?.role == 'organisateur'||this.auth.getUser()?.role == 'admin';
   }
 
   loadSessions(conferenceId: number): void {
