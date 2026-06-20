@@ -125,4 +125,10 @@ export class ConferenceDetails implements OnInit {
 
     return this.conference?.organisateur_id?.toString() || '';
   }
+
+  
+  get canManage(): boolean {
+    const role = this.currentUser?.role;
+    return role === 'organisateur' || role === 'admin';
+  }
 }

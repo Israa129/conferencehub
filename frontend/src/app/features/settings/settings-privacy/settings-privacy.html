@@ -1,0 +1,51 @@
+<div class="settings-section">
+  <div class="section-card">
+    <h3>🛡️ Confidentialité</h3>
+    <p class="section-desc">Contrôlez qui peut voir vos informations.</p>
+
+    <div class="alert success" *ngIf="success">✅ {{ success }}</div>
+    <div class="alert error"   *ngIf="error">❌ {{ error }}</div>
+
+    <div class="form-group">
+      <label>Visibilité du profil</label>
+      <div class="radio-group vertical">
+        <label *ngFor="let v of visibilites"
+               class="radio-card-vertical"
+               [class.selected]="form.visibilite_profil === v.value">
+          <input type="radio" [(ngModel)]="form.visibilite_profil" [value]="v.value" />
+          <div>
+            <strong>{{ v.label }}</strong>
+            <p>{{ v.desc }}</p>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="toggle-group">
+      <div class="toggle-item">
+        <div>
+          <strong>Afficher mon adresse email</strong>
+          <p>Votre email sera visible sur votre profil public.</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" [(ngModel)]="form.afficher_email" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-item">
+        <div>
+          <strong>Afficher mon pays</strong>
+          <p>Votre pays sera visible sur votre profil public.</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" [(ngModel)]="form.afficher_pays" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-primary" (click)="save()" [disabled]="loading">
+      {{ loading ? 'Enregistrement...' : 'Sauvegarder' }}
+    </button>
+  </div>
+</div>

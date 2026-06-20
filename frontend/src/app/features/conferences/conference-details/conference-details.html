@@ -10,6 +10,15 @@
       <span class="badge badge-blue">
         {{ conference.theme }}
       </span>
+
+      @if (canManage) {
+        <button
+          class="btn btn-danger"
+          style="font-size:12px; padding:5px 12px;"
+          (click)="delete()">
+          🗑️ Supprimer la conférence
+        </button>
+      }
     </div>
 
     <h1 style="font-size:1.75rem; margin-bottom:8px;">
@@ -59,13 +68,15 @@
       <p>Programme de la conference</p>
     </div>
 
-    <a
-      routerLink="/sessions/new"
-      [queryParams]="{ conferenceId: conference.id }"
-      class="btn btn-outline"
-      style="font-size:12px;">
-      + Ajouter une session
-    </a>
+    @if (canManage) {
+      <a
+        routerLink="/sessions/new"
+        [queryParams]="{ conferenceId: conference.id }"
+        class="btn btn-outline"
+        style="font-size:12px;">
+        + Ajouter une session
+      </a>
+    }
   </div>
 
   <div style="padding:1.25rem 1.5rem;">
@@ -118,15 +129,17 @@
               </div>
             </div>
 
-            <div style="display:flex; gap:6px;">
-              <button
-                class="btn btn-danger"
-                style="font-size:12px; padding:5px 12px;"
-                [disabled]="deletingSessionId === session.id"
-                (click)="deleteSession(session)">
-                {{ deletingSessionId === session.id ? 'Suppression...' : 'Suppr.' }}
-              </button>
-            </div>
+            @if (canManage) {
+              <div style="display:flex; gap:6px;">
+                <button
+                  class="btn btn-danger"
+                  style="font-size:12px; padding:5px 12px;"
+                  [disabled]="deletingSessionId === session.id"
+                  (click)="deleteSession(session)">
+                  {{ deletingSessionId === session.id ? 'Suppression...' : 'Suppr.' }}
+                </button>
+              </div>
+            }
 
           </div>
 

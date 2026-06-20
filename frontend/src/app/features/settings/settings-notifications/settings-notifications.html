@@ -1,0 +1,56 @@
+<div class="settings-section">
+  <div class="section-card">
+    <h3>🔔 Préférences de notifications</h3>
+    <p class="section-desc">Choisissez quand et comment vous souhaitez être notifié.</p>
+
+    <div class="alert success" *ngIf="success">✅ {{ success }}</div>
+    <div class="alert error"   *ngIf="error">❌ {{ error }}</div>
+
+    <div class="toggle-group">
+      <div class="toggle-item">
+        <div>
+          <strong>Inscriptions aux conférences</strong>
+          <p>Confirmation et rappels pour vos inscriptions.</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" [(ngModel)]="form.notif_email_inscription" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-item">
+        <div>
+          <strong>Actualités des conférences</strong>
+          <p>Mises à jour sur les conférences auxquelles vous participez.</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" [(ngModel)]="form.notif_email_conference" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-item">
+        <div>
+          <strong>Newsletter</strong>
+          <p>Nouvelles conférences et actualités de la plateforme.</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" [(ngModel)]="form.notif_email_newsletter" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-item">
+        <div>
+          <strong>Notifications push</strong>
+          <p>Alertes en temps réel dans votre navigateur.</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" [(ngModel)]="form.notif_push" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-primary" (click)="save()" [disabled]="loading">
+      {{ loading ? 'Enregistrement...' : 'Sauvegarder' }}
+    </button>
+  </div>
+</div>

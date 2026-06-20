@@ -82,24 +82,16 @@
       <a class="nav-item" routerLink="/admin/logs" routerLinkActive="active">
         <span>📋</span> Journaux d'audit
       </a>
-      <span class="nav-section">CONFIGURATION</span>
-      <a class="nav-item" routerLink="/admin/parametres" routerLinkActive="active">
-        <span>⚙️</span> Paramètres
-      </a>
     </ng-container>
 
-    <!-- COMMUN -->
+    <!-- COMMUN À TOUS LES RÔLES -->
     <div class="sidebar-divider"></div>
     <a class="nav-item" routerLink="/profile" routerLinkActive="active">
       <span>👤</span> Mon profil
     </a>
-
-    <!-- ✅ Paramètres commun masqué pour l'admin (qui a déjà le sien dans CONFIGURATION) -->
-    <a *ngIf="userState.user()?.role !== 'admin'"
-       class="nav-item" routerLink="/participant/settings" routerLinkActive="active">
+    <a class="nav-item" routerLink="/settings" routerLinkActive="active">
       <span>⚙️</span> Paramètres
     </a>
-
     <a class="nav-item logout" (click)="logout()">
       <span>🚪</span> Déconnexion
     </a>

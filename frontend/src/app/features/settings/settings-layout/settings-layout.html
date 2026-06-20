@@ -1,0 +1,21 @@
+<div class="settings-container">
+
+  <aside class="settings-menu">
+    <h2>⚙️ Paramètres</h2>
+    <nav>
+      <a *ngFor="let item of menu"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: item.exact }"
+         class="settings-nav-item">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span>{{ item.label }}</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="settings-content">
+    <router-outlet />
+  </main>
+
+</div>

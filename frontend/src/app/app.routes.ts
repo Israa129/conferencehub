@@ -21,6 +21,13 @@ import { AdminUtilisateurs } from './features/admin/admin-utilisateurs/admin-uti
 import { Analytics } from './features/admin/analytics/analytics';
 import { JournauxAudit } from './features/admin/journaux-audit/journaux-audit';
 
+import { SettingsLayout } from './features/settings/settings-layout/settings-layout';
+import { SettingsSecurity } from './features/settings/settings-security/settings-security';
+import { SettingsNotifications } from './features/settings/settings-notifications/settings-notifications';
+import { SettingsDisplay } from './features/settings/settings-display/settings-display';
+import { SettingsPrivacy } from './features/settings/settings-privacy/settings-privacy';
+
+
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -53,7 +60,7 @@ export const routes: Routes = [
   { path: 'admin/roles', component: AdminDashboardComponent },
   { path: 'admin/analytics', component: Analytics },
   { path: 'admin/logs', component: JournauxAudit },
-  { path: 'admin/parametres', component: AdminDashboardComponent },
+  { path: 'admin/parametres', component:  SettingsLayout},
   { path: 'admin/mailing', component: AdminDashboardComponent },
   { path: 'admin/create-user', component: RegisterComponent },
   { path: 'conferences', component: ConferenceList },
@@ -72,6 +79,18 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
+
+  {
+  path: 'settings',
+  component: SettingsLayout,
+  children: [
+    { path: '',              redirectTo: 'security', pathMatch: 'full' },
+    { path: 'security',      component: SettingsSecurity },
+    { path: 'notifications', component: SettingsNotifications },
+    { path: 'display',       component: SettingsDisplay },
+    { path: 'privacy',       component: SettingsPrivacy },
+  ]
+},
 
   { path: 'sessions/new', component: ConferenceFormulaire },
 

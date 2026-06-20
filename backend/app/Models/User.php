@@ -20,6 +20,16 @@ class User extends Authenticatable
         'pays',
         'statut', 
         'last_login_at',
+            'notif_email_inscription',
+            'notif_email_conference',
+            'notif_email_newsletter',
+            'notif_push',
+            'theme',
+            'langue',
+            'densite',
+            'visibilite_profil',
+            'afficher_email',
+            'afficher_pays',
     ];
 
     protected $hidden = [

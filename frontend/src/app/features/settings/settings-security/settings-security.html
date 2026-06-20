@@ -1,0 +1,34 @@
+<div class="settings-section">
+
+  <div class="section-card">
+    <h3>🔒 Sécurité du compte</h3>
+    <p class="section-desc">
+      Pour changer votre mot de passe, rendez-vous dans
+      <a routerLink="/profile">Mon profil → Sécurité</a>.
+    </p>
+  </div>
+
+  <div class="section-card danger-zone">
+    <h3>⚠️ Zone dangereuse</h3>
+    <p class="section-desc">La suppression est irréversible. Toutes vos données seront perdues.</p>
+
+    <div class="alert error" *ngIf="error">❌ {{ error }}</div>
+
+    <button class="btn-danger" (click)="showDeleteConfirm = !showDeleteConfirm">
+      🗑️ Supprimer mon compte
+    </button>
+
+    <div class="delete-confirm" *ngIf="showDeleteConfirm">
+      <p>Entrez votre mot de passe pour confirmer :</p>
+      <input type="password" [(ngModel)]="deletePassword" placeholder="Votre mot de passe" />
+      <div class="confirm-actions">
+        <button class="btn-secondary" (click)="showDeleteConfirm = false">Annuler</button>
+        <button class="btn-danger" (click)="confirmDelete()"
+          [disabled]="loadingDelete || !deletePassword">
+          {{ loadingDelete ? 'Suppression...' : 'Confirmer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
