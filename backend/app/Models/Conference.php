@@ -28,7 +28,7 @@ class Conference extends Model
 
     public function sessionsConference()
     {
-        return $this->hasMany(SessionConference::class);
+        return $this->hasMany(SessionConference::class, 'conference_id');
     }
 
     public function inscriptions()

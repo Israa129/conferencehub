@@ -1,12 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { forkJoin, Observable } from 'rxjs';
@@ -28,6 +21,10 @@ export class ConferenceFormulaire implements OnInit {
   isEdit = false;
   isSessionOnly = false;
   conferenceId?: number;
+  
+  // 💡 Gestion des états d'erreur globaux et de chargement
+  errorMessage: string | null = null;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -80,7 +77,10 @@ export class ConferenceFormulaire implements OnInit {
             organisateur_id: conf.organisateur_id,
           });
         },
-        error: (error) => console.log(error),
+        error: (error) => {
+          console.error(error);
+          this.errorMessage = "Impossible de charger les données de la conférence.";
+        },
       });
 
     } else {
@@ -96,6 +96,11 @@ export class ConferenceFormulaire implements OnInit {
     return this.form.controls;
   }
 
+  // Helper pour cibler les validateurs d'une session spécifique dans le HTML
+  getSessionControls(index: number) {
+    return (this.sessions.at(index) as FormGroup).controls;
+  }
+
   createSessionGroup(): FormGroup {
     return this.fb.group({
       titre: ['', Validators.required],
@@ -107,6 +112,7 @@ export class ConferenceFormulaire implements OnInit {
   }
 
   addSession(): void {
+    this.errorMessage = null;
     this.sessions.push(this.createSessionGroup());
   }
 
@@ -115,11 +121,15 @@ export class ConferenceFormulaire implements OnInit {
   }
 
   submit(): void {
+    this.errorMessage = null;
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.errorMessage = "Veuillez corriger les erreurs dans le formulaire avant de soumettre.";
       return;
     }
 
+    this.isSubmitting = true;
     const { sessions, ...conferencePayload } = this.form.value;
 
     if (this.isSessionOnly && this.conferenceId) {
@@ -132,7 +142,11 @@ export class ConferenceFormulaire implements OnInit {
         next: () => {
           this.router.navigate(['/conferences', this.conferenceId]);
         },
-        error: (err) => console.error('Erreur modification conference:', err)
+        error: (err) => {
+          this.isSubmitting = false;
+          console.error('Erreur modification conference:', err);
+          this.errorMessage = err.error?.message || "Une erreur est survenue lors de la modification.";
+        }
       });
       return;
     }
@@ -142,7 +156,8 @@ export class ConferenceFormulaire implements OnInit {
         const conferenceId = newConf?.id;
 
         if (!conferenceId) {
-          console.error('Conference ID manquant');
+          this.isSubmitting = false;
+          this.errorMessage = "La conférence a été créée mais l'identifiant de retour est introuvable.";
           return;
         }
 
@@ -154,7 +169,9 @@ export class ConferenceFormulaire implements OnInit {
         this.createSessions(conferenceId, sessions);
       },
       error: (err) => {
+        this.isSubmitting = false;
         console.error('Erreur creation conference:', err);
+        this.errorMessage = err.error?.message || "Erreur serveur lors de la création de la conférence.";
       }
     });
   }
@@ -178,8 +195,9 @@ export class ConferenceFormulaire implements OnInit {
         this.router.navigate(['/conferences', conferenceId]);
       },
       error: (err) => {
+        this.isSubmitting = false;
         console.error('Erreur creation sessions:', err);
-        this.router.navigate(['/conferences', conferenceId]);
+        this.errorMessage = "La conférence a bien été enregistrée, mais une ou plusieurs sessions n'ont pas pu être créées.";
       }
     });
   }
@@ -191,10 +209,7 @@ export class ConferenceFormulaire implements OnInit {
 
   private setCurrentOrganisateur(): void {
     const user = this.auth.getUser();
-
-    if (!user?.id) {
-      return;
-    }
+    if (!user?.id) return;
 
     this.form.patchValue({
       organisateur_id: user.id
@@ -203,6 +218,9 @@ export class ConferenceFormulaire implements OnInit {
 
   private toDateInput(date: string | Date): string {
     if (!date) return '';
-    return new Date(date).toISOString().split('T')[0];
+    // Format requis pour datetime-local : YYYY-MM-DDTHH:mm
+    const d = new Date(date);
+    const pad = (n: number) => n < 10 ? '0' + n : n;
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 }

@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { ConferenceService } from '../../../core/services/conference/conference-service';
 import { Conference } from '../../../core/models/Conference';
 import { AuthService } from '../../../core/services/auth';
+import { DeleteModal } from '../../delete-modal/delete-modal';
 
 @Component({
   selector: 'app-conference-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, DeleteModal],
   templateUrl: './conference-list.html',
   styleUrl: './conference-list.scss',
 })
@@ -18,6 +19,10 @@ export class ConferenceList implements OnInit {
   searchQuery = '';
   conferences = signal<Conference[]>([]);
   loaded = signal(false);
+
+  // --- Delete modal state ---
+  isDeleteModalOpen = signal(false);
+  conferenceToDelete = signal<Conference | null>(null);
 
   constructor(
     private conferenceService: ConferenceService,
@@ -34,38 +39,39 @@ export class ConferenceList implements OnInit {
   }
 
   loadConferences(): void {
-  const userString = localStorage.getItem('user');
+    const userString = localStorage.getItem('user');
 
-  let role: string | null = null;
-  let userId: number | null = null;
-  if (userString) {
-    try {
-      const userObj = JSON.parse(userString);
-      role = userObj.role; 
-      userId = userObj.id;
-    } catch (e) {
-      console.error("Erreur lors du parsing de l'objet utilisateur", e);
+    let role: string | null = null;
+    let userId: number | null = null;
+    if (userString) {
+      try {
+        const userObj = JSON.parse(userString);
+        role = userObj.role;
+        userId = userObj.id;
+      } catch (e) {
+        console.error("Erreur lors du parsing de l'objet utilisateur", e);
+      }
+    }
+
+    if (role === 'organisateur' && userId) {
+      this.conferenceService.getByOrganisateur(userId).subscribe({
+        next: (data) => this.handleSuccess(data),
+        error: (err) => {
+          console.error(err);
+          this.loaded.set(true);
+        }
+      });
+    } else {
+      this.conferenceService.getAll().subscribe({
+        next: (data) => this.handleSuccess(data),
+        error: (err) => {
+          console.error(err);
+          this.loaded.set(true);
+        }
+      });
     }
   }
 
-  if (role === 'organisateur' && userId) {
-    this.conferenceService.getByOrganisateur(userId).subscribe({
-      next: (data) => this.handleSuccess(data),
-      error: (err) => {
-        console.error(err);
-        this.loaded.set(true);
-      }
-    });
-  } else {
-    this.conferenceService.getAll().subscribe({
-      next: (data) => this.handleSuccess(data),
-      error: (err) => {
-        console.error(err);
-        this.loaded.set(true);
-      }
-    });
-  }
-}
   private handleSuccess(data: Conference[]): void {
     this.conferences.set(data);
     this.loaded.set(true);
@@ -91,13 +97,32 @@ export class ConferenceList implements OnInit {
     this.router.navigate(['/conferences', conf.id, 'edit']);
   }
 
-  onDelete(id: number): void {
-    if (!confirm('Supprimer cette conférence ?')) return;
-    this.conferenceService.delete(id).subscribe({
+  // --- Open modal instead of native confirm ---
+  onDelete(conf: Conference): void {
+    this.conferenceToDelete.set(conf);
+    this.isDeleteModalOpen.set(true);
+  }
+
+  onCancelDelete(): void {
+    this.isDeleteModalOpen.set(false);
+    this.conferenceToDelete.set(null);
+  }
+
+  onConfirmDelete(): void {
+    const conf = this.conferenceToDelete();
+    if (!conf) return;
+
+    this.conferenceService.delete(conf.id).subscribe({
       next: () => {
-        this.conferences.update(list => list.filter(c => c.id !== id));
+        this.conferences.update(list => list.filter(c => c.id !== conf.id));
+        this.isDeleteModalOpen.set(false);
+        this.conferenceToDelete.set(null);
       },
-      error: (err) => console.error('Erreur suppression', err)
+      error: (err) => {
+        console.error('Erreur suppression', err);
+        this.isDeleteModalOpen.set(false);
+        this.conferenceToDelete.set(null);
+      }
     });
   }
 
