@@ -1,8 +1,8 @@
 <div class="page-header">
   <div>
     <h1>Conférences</h1>
-    <p *ngIf="!isParticipant">Parcourez et gérez toutes les conférences</p>
-    <p *ngIf="isParticipant">Parcourez et inscrivez-vous aux conférences</p>
+    <p *ngIf="getRole()" >Parcourez et gérez toutes les conférences</p>
+    <p *ngIf="getRole()" >Parcourez et inscrivez-vous aux conférences</p>
   </div>
   <div class="header-actions">
     <div class="search-bar">
@@ -13,8 +13,7 @@
         [(ngModel)]="searchQuery"
       />
     </div>
-    <!-- Bouton visible uniquement pour non-participants -->
-    <a *ngIf="!isParticipant" routerLink="/conferences/new" class="btn btn-primary">
+    <a *ngIf="getRole()"  routerLink="/conferences/new" class="btn btn-primary">
       <span class="material-icons">add</span>
       Nouvelle conférence
     </a>
@@ -33,7 +32,7 @@
     <div class="empty-state">
       <span class="material-icons empty-icon">mic</span>
       <p>Aucune conférence trouvée.</p>
-      <a *ngIf="!isParticipant" routerLink="/conferences/new" class="btn btn-primary mt-4">
+      <a *ngIf="getRole()" routerLink="/conferences/new" class="btn btn-primary mt-4">
         Créer la première
       </a>
     </div>
@@ -93,11 +92,11 @@
                       <span class="material-icons">visibility</span>
                       Voir
                     </a>
-                    <button (click)="onEdit(conf)" class="btn btn-outline btn-sm" *ngIf="!isParticipant">
+                    <button (click)="onEdit(conf)" class="btn btn-outline btn-sm" *ngIf="getRole()" >
                       <span class="material-icons">edit</span>
                       Modifier
                     </button>
-                    <button (click)="onDelete(conf)" class="btn btn-danger btn-sm" *ngIf="!isParticipant">
+                    <button (click)="onDelete(conf)" class="btn btn-danger btn-sm" *ngIf="getRole()" >
   <span class="material-icons">delete</span>
   Suppr.
 </button>
