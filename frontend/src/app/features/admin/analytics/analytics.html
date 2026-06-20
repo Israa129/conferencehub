@@ -1,0 +1,55 @@
+<div class="analytics-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Analytics</h1>
+      <p>Statistiques d'usage de la plateforme, alimentées en temps réel par MongoDB.</p>
+    </div>
+    <div class="periode-selector">
+      <button [class.active]="periode === 7" (click)="changerPeriode(7)">7 jours</button>
+      <button [class.active]="periode === 30" (click)="changerPeriode(30)">30 jours</button>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="chargement">⏳ Chargement des analytics...</div>
+
+  <div class="analytics-grid" *ngIf="!chargement && data">
+
+    <div class="kpi-card">
+      <div class="kpi-icon orange">🔐</div>
+      <div>
+        <strong class="kpi-number">{{ data.echecs_connexion }}</strong>
+        <span class="kpi-label">Tentatives de connexion échouées</span>
+      </div>
+    </div>
+
+    <div class="chart-card wide">
+      <h3>Connexions sur la période</h3>
+      <canvas #connexionsCanvas></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Connexions par rôle</h3>
+      <canvas #rolesCanvas></canvas>
+    </div>
+
+    <div class="chart-card wide">
+      <h3>Types d'actions effectuées</h3>
+      <canvas #actionsCanvas></canvas>
+    </div>
+
+    <div class="timeline-card wide">
+      <h3>Activité récente</h3>
+      <div class="timeline-empty" *ngIf="data.activite_recente.length === 0">
+        Aucune activité enregistrée pour le moment.
+      </div>
+      <div class="timeline-item" *ngFor="let item of data.activite_recente">
+        <span class="timeline-role">{{ roleLabel(item.role) }}</span>
+        <span class="timeline-desc">{{ item.description }}</span>
+        <span class="timeline-date">{{ item.date | date:'dd/MM HH:mm' }}</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>

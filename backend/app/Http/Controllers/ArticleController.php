@@ -195,4 +195,25 @@ class ArticleController extends Controller
             'updated_at'       => $a->updated_at?->toISOString(),
         ];
     }
+
+    public function changerStatut(Request $request, string $id): JsonResponse
+    {
+        $request->validate([
+            'statut'       => 'required|in:en_revision,accepte,refuse',
+            'commentaires' => 'nullable|string|max:2000',
+        ]);
+
+        $article = Article::findOrFail($id);
+
+        $article->update([
+            'statut'       => $request->statut,
+            'commentaires' => $request->commentaires ?? $article->commentaires,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Le statut de l\'article a été mis à jour.',
+            'data'    => $article,
+        ]);
+    }
 }

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('fichier_pdf')->nullable();
             $table->foreignId('session_id')
                 ->nullable()
-                ->constrained('sessions_conference')
+                ->constrained('session_conferences')
                 ->onDelete('set null');
             $table->timestamps();
         });
