@@ -10,15 +10,6 @@
       <span class="badge badge-blue">
         {{ conference.theme }}
       </span>
-
-      @if (canManage) {
-        <button
-          class="btn btn-danger"
-          style="font-size:12px; padding:5px 12px;"
-          (click)="delete()">
-          🗑️ Supprimer la conférence
-        </button>
-      }
     </div>
 
     <h1 style="font-size:1.75rem; margin-bottom:8px;">

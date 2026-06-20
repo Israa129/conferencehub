@@ -23,7 +23,7 @@ export class ConferenceDetails implements OnInit {
   loadingSessions = false;
   deletingSessionId?: number;
   currentUser: any;
-
+  organisateurName="";
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -50,12 +50,29 @@ export class ConferenceDetails implements OnInit {
         this.loading = false;
 
         this.loadSessions(id);
+        this.loadOrganisateurName(conf.organisateur_id);
 
         this.cdr.detectChanges();
       },
       error: (error) => {
         console.log(error);
         this.loading = false;
+      },
+    });
+  }
+
+  loadOrganisateurName(organisateurId: number): void {
+    if (!organisateurId) {
+      return;
+    }
+
+    this.auth.getNameById(organisateurId).subscribe({
+      next: (res) => {
+        this.organisateurName = res.name;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.log(error);
       },
     });
   }
@@ -116,19 +133,6 @@ export class ConferenceDetails implements OnInit {
       },
     });
   }
-
-  get organisateurName(): string {
-    if (
-      this.currentUser &&
-      this.conference &&
-      Number(this.currentUser.id) === Number(this.conference.organisateur_id)
-    ) {
-      return `${this.currentUser.prenom || ''} ${this.currentUser.nom || ''}`.trim();
-    }
-
-    return this.conference?.organisateur_id?.toString() || '';
-  }
-
   
   get canManage(): boolean {
     const role = this.currentUser?.role;

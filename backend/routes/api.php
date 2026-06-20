@@ -69,7 +69,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile',          [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
 });
-
 // Routes conférencier (pas encore protégées par auth:sanctum)
 Route::prefix('conferencier')->group(function () {
     Route::get('/stats',                  [ArticleController::class, 'stats']);
@@ -80,3 +79,4 @@ Route::prefix('conferencier')->group(function () {
     Route::delete('/articles/{id}',       [ArticleController::class, 'destroy']);
     Route::get('/articles/{id}/download', [ArticleController::class, 'download']);
 });
+Route::get('/users/{id}/name', [AuthController::class, 'getNameById']);
