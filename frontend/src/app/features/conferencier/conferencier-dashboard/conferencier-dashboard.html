@@ -132,10 +132,6 @@
             <option value="toutes">Toutes les conférences</option>
             <option *ngFor="let c of conferencesDisponibles()" [value]="c.id">{{ c.nom }}</option>
           </select>
-          <select class="filter-select" (change)="setTriConference($any($event.target).value)">
-            <option value="az">Conférence A → Z</option>
-            <option value="za">Conférence Z → A</option>
-          </select>
         </div>
       </div>
 
